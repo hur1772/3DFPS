@@ -42030,7 +42030,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 20b727afe33db4c469749fe7c89c88b1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 20b727afe33db4c469749fe7c89c88b1, type: 3}
       propertyPath: m_LocalPosition.z
@@ -42068,6 +42068,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PBR
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 20b727afe33db4c469749fe7c89c88b1, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: e9a0d404e9bee58489e3f2c70426ff97, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 20b727afe33db4c469749fe7c89c88b1, type: 3}
 --- !u!1001 &1858261193
