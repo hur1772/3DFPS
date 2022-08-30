@@ -36,6 +36,8 @@ public class PlayerCtrl : MonoBehaviour
     [SerializeField]
     private Camera theCamera;
 
+    public Animator animator;
+
     bool isGround = true;
 
     bool isRun = false;
@@ -43,6 +45,7 @@ public class PlayerCtrl : MonoBehaviour
     void Start()
     {
         rbody = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
 
         //Rigidbody의 무게중심을 낮게 설정
         rbody.centerOfMass = new Vector3(0.0f, -2.5f, 0.0f);
@@ -54,7 +57,7 @@ public class PlayerCtrl : MonoBehaviour
     {
         if (isGround)
         {
-            rbody.drag = 30;
+            rbody.drag = 50;
         }
         else
             rbody.drag = 0;
@@ -62,12 +65,14 @@ public class PlayerCtrl : MonoBehaviour
         switch(playerstate)
         {
             case PlayerState.idle:
-
+                AnimType("Idle");
                 break;
             case PlayerState.move:
+                AnimType("Move");
                 Move(walkSpeed);
                 break;
             case PlayerState.run:
+                AnimType("Run");
                 Run();
                 break;
             case PlayerState.shot:
@@ -85,6 +90,17 @@ public class PlayerCtrl : MonoBehaviour
         
         CameraRotation();      
         CharacterRotation();    
+    }
+
+    private void AnimType(string anim)
+    {
+        animator.SetBool("Idle", false);
+        animator.SetBool("Move", false);
+        animator.SetBool("Run", false);
+        animator.SetBool("Death", false);
+        //animator.SetBool("Shot", false);
+
+        animator.SetBool(anim, true);
     }
 
     private void Move(float speed)
