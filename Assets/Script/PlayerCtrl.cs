@@ -36,16 +36,31 @@ public class PlayerCtrl : MonoBehaviour
     [SerializeField]
     private Camera theCamera;
 
-    public Animator animator;
+    [HideInInspector]public Animator animator;
 
     bool isGround = true;
 
     bool isRun = false;
 
+    bool isShot = false;
+
+    //총알 발사 관련 변수
+    public MeshRenderer muzzleFlash;
+
+    float fireDur = 0.1f;
+
+    //총알 프리팹
+    public GameObject bullet;
+    //총알 발사좌표
+    public Transform firePos;
+
+
     void Start()
     {
         rbody = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+
+        muzzleFlash.enabled = false;
 
         //Rigidbody의 무게중심을 낮게 설정
         rbody.centerOfMass = new Vector3(0.0f, -2.5f, 0.0f);
@@ -62,16 +77,21 @@ public class PlayerCtrl : MonoBehaviour
         else
             rbody.drag = 0;
 
-        switch(playerstate)
+        Shot();
+
+        switch (playerstate)
         {
             case PlayerState.idle:
+                if (isShot == false) ;
                 AnimType("Idle");
                 break;
             case PlayerState.move:
+                if (isShot == false) ;
                 AnimType("Move");
                 Move(walkSpeed);
                 break;
             case PlayerState.run:
+                if (isShot == false) ;
                 AnimType("Run");
                 Run();
                 break;
@@ -98,9 +118,69 @@ public class PlayerCtrl : MonoBehaviour
         animator.SetBool("Move", false);
         animator.SetBool("Run", false);
         animator.SetBool("Death", false);
-        //animator.SetBool("Shot", false);
+        animator.SetBool("Shot", false);
 
         animator.SetBool(anim, true);
+    }
+
+    public void Shot()
+    {
+        fireDur = fireDur - Time.deltaTime;
+        if (fireDur <= 0.0f)
+        {
+            fireDur = 0.0f;
+            // 마우스 왼쪽 버튼을 클릭했을 때 Fire 함수 호출
+            if (Input.GetMouseButton(0))
+            {
+                isShot = true;
+                AnimType("Shot");
+                playerstate = PlayerState.shot;
+                Fire();
+                fireDur = 0.1f;
+            }
+            else
+            {
+                isShot = false;
+            }
+            Debug.Log(isShot);
+        }
+    }
+
+    void Fire()
+    {
+        //동적으로 총알을 생성하는 함수
+        CreateBullet();
+
+        //사운드 발생 함수
+        //source.PlayOneShot(fireSfx, 0.2f);
+        //잠시 기다리는 루틴을 위해 코루틴 함수로 호출
+        StartCoroutine(this.ShowMuzzleFlash());
+    }
+
+    void CreateBullet()
+    {
+        //Bullet 프리팹을 동적으로 생성
+        Instantiate(bullet, firePos.position, firePos.rotation);
+    }
+
+    IEnumerator ShowMuzzleFlash()
+    {
+        //MuzzleFlash 스케일을 불규칙하게 변경
+        float scale = Random.Range(0.1f, 0.15f);
+        muzzleFlash.transform.localScale = Vector3.one * scale;
+
+        //MuzzleFlash를 Z축을 기준으로 불규칙하게 회전시킴
+        Quaternion rot = Quaternion.Euler(0, 0, Random.Range(0, 360));
+        muzzleFlash.transform.localRotation = rot;
+
+        //활성화에서 보이게 함
+        muzzleFlash.enabled = true;
+
+        //불규칙적인 시간 동안 Delay한 다음 MeshRenderer를 비활성화
+        yield return new WaitForSeconds(Random.Range(0.01f, 0.03f));  //Random.Range(0.05f, 0.3f));
+
+        //비활성화해서 보이지 않게 함
+        muzzleFlash.enabled = false;
     }
 
     private void Move(float speed)
@@ -158,6 +238,15 @@ public class PlayerCtrl : MonoBehaviour
         if(Input.GetKeyUp(KeyCode.LeftShift))
         {
             isRun = false;
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            isShot = true;
+        }
+        else
+        {
+            isShot = false;
         }
     }
 
