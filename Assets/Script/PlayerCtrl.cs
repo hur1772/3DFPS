@@ -35,6 +35,7 @@ public class PlayerCtrl : MonoBehaviour
 
     [SerializeField]
     private Camera theCamera;
+    public GameObject RightArm;
 
     [HideInInspector]public Animator animator;
 
@@ -133,7 +134,7 @@ public class PlayerCtrl : MonoBehaviour
             if (Input.GetMouseButton(0))
             {
                 isShot = true;
-                AnimType("Shot");
+                //AnimType("Shot");
                 playerstate = PlayerState.shot;
                 Fire();
                 fireDur = 0.1f;
@@ -142,7 +143,6 @@ public class PlayerCtrl : MonoBehaviour
             {
                 isShot = false;
             }
-            Debug.Log(isShot);
         }
     }
 
@@ -166,7 +166,7 @@ public class PlayerCtrl : MonoBehaviour
     IEnumerator ShowMuzzleFlash()
     {
         //MuzzleFlash 스케일을 불규칙하게 변경
-        float scale = Random.Range(0.1f, 0.15f);
+        float scale = Random.Range(1f, 1.5f);
         muzzleFlash.transform.localScale = Vector3.one * scale;
 
         //MuzzleFlash를 Z축을 기준으로 불규칙하게 회전시킴
@@ -216,6 +216,7 @@ public class PlayerCtrl : MonoBehaviour
         currentCameraRotationX = Mathf.Clamp(currentCameraRotationX, -cameraRotationLimit, cameraRotationLimit);
 
         theCamera.transform.localEulerAngles = new Vector3(currentCameraRotationX, 0f, 0f);
+        RightArm.transform.localEulerAngles = new Vector3((currentCameraRotationX) + 165, 0, 17.19f);
     }
 
     private void stateCheck()
