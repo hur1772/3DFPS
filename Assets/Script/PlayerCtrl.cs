@@ -76,23 +76,20 @@ public class PlayerCtrl : MonoBehaviour
             rbody.drag = 50;
         }
         else
-            rbody.drag = 0;
+            rbody.drag = -5;
 
         Shot();
 
         switch (playerstate)
         {
             case PlayerState.idle:
-                if (isShot == false) ;
                 AnimType("Idle");
                 break;
             case PlayerState.move:
-                if (isShot == false) ;
                 AnimType("Move");
                 Move(walkSpeed);
                 break;
             case PlayerState.run:
-                if (isShot == false) ;
                 AnimType("Run");
                 Run();
                 break;
@@ -106,7 +103,7 @@ public class PlayerCtrl : MonoBehaviour
 
                 break;
         }
-
+        FirePosCheck();
         stateCheck();
         
         CameraRotation();      
@@ -146,6 +143,24 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
+    void FirePosCheck()
+    {
+        Ray ray = theCamera.ScreenPointToRay(Input.mousePosition);
+        //생성된 Ray를 Scene 뷰에 녹색 광선으로 표현
+        Debug.DrawRay(ray.origin, ray.direction * 100.0f, Color.green);
+
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity,
+                               1 << LayerMask.NameToLayer("TERRAIN")))
+        {
+            firePos.LookAt(hit.point);
+        }
+        else if (Physics.Raycast(ray, out hit, Mathf.Infinity,
+                               1 << LayerMask.NameToLayer("TURRETPICKOBJ")))
+        {
+           firePos.LookAt(hit.point);
+        } //else
+    }
+
     void Fire()
     {
         //동적으로 총알을 생성하는 함수
@@ -163,36 +178,7 @@ public class PlayerCtrl : MonoBehaviour
         //    return;
 
         //메인 카메라에서 마우스 커서의 위치로 캐스팅되는 Ray를 생성
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        //생성된 Ray를 Scene 뷰에 녹색 광선으로 표현
-        Debug.DrawRay(ray.origin, ray.direction * 100.0f, Color.green);
-
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity,
-                               1 << LayerMask.NameToLayer("TERRAIN")))
-        {
-            //Ray에 맞은 위치를 로컬좌표로 변환
-            Vector3 relative = tr.InverseTransformPoint(hit.point);
-            //역탄젠트 함수인 Atan2로 두 점 간의 각도를 계산
-            float angle = Mathf.Atan2(relative.x, relative.z) * Mathf.Rad2Deg;
-            //rotSpeed 변수에 지정된 속도로 회전
-            tr.Rotate(0, angle * Time.deltaTime * rotSpeed, 0);
-        }
-        else
-        {
-            Vector3 a_OrgVec = ray.origin + ray.direction * 2000.0f;
-            ray = new Ray(a_OrgVec, -ray.direction);
-
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity,
-                                         1 << LayerMask.NameToLayer("TURRETPICKOBJ")))
-            {
-                //Ray에 맞은 위치를 로컬좌표로 변환
-                Vector3 relative = tr.InverseTransformPoint(hit.point);
-                //역탄젠트 함수인 Atan2로 두 점 간의 각도를 계산
-                float angle = Mathf.Atan2(relative.x, relative.z) * Mathf.Rad2Deg;
-                //rotSpeed 변수에 지정된 속도로 회전
-                tr.Rotate(0, angle * Time.deltaTime * rotSpeed, 0);
-            }
-        } //else
+       
 
         //Bullet 프리팹을 동적으로 생성
         Instantiate(bullet, firePos.position, firePos.rotation);
@@ -297,7 +283,7 @@ public class PlayerCtrl : MonoBehaviour
 
     void OnCollisionStay(Collision collision)
     {
-        if(collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        if(collision.gameObject.layer == LayerMask.NameToLayer("TERRAIN"))
         {
             isGround = true;
         }
@@ -305,7 +291,7 @@ public class PlayerCtrl : MonoBehaviour
 
     void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        if (collision.gameObject.layer == LayerMask.NameToLayer("TERRAIN"))
         {
             isGround = false;
         }
