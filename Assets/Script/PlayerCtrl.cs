@@ -56,6 +56,10 @@ public class PlayerCtrl : MonoBehaviour
     public Transform firePos;
 
 
+    //수류탄 발사 관련 변수
+    public Transform GrenadePos;
+    public GameObject Grenade;
+
     void Start()
     {
         rbody = GetComponent<Rigidbody>();
@@ -153,12 +157,14 @@ public class PlayerCtrl : MonoBehaviour
                                1 << LayerMask.NameToLayer("TERRAIN")))
         {
             firePos.LookAt(hit.point);
+            GrenadePos.LookAt(hit.point);
         }
-        else if (Physics.Raycast(ray, out hit, Mathf.Infinity,
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity,
                                1 << LayerMask.NameToLayer("TURRETPICKOBJ")))
         {
            firePos.LookAt(hit.point);
-        } //else
+            GrenadePos.LookAt(hit.point);
+        } 
     }
 
     void Fire()
@@ -269,6 +275,11 @@ public class PlayerCtrl : MonoBehaviour
         else
         {
             isShot = false;
+        }
+
+        if(Input.GetKeyDown(KeyCode.G))
+        {
+            Instantiate(Grenade, GrenadePos.position, GrenadePos.rotation);
         }
     }
 
