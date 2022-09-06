@@ -30,21 +30,29 @@ public class GrenadeCtrl : MonoBehaviour
             // 발사!!
             isShot = true;
         }
+        RaycastHit hit;
+        Debug.DrawRay(transform.position, -transform.up * 0.35f, Color.red);
+
+        if (Physics.Raycast(transform.position, -transform.up, out hit, 0.35f))
+        {
+            ExpGrenade();
+        }
+
+        //Ray ray = gameObject.ScreenPointToRay(Input.mousePosition);
+        ////생성된 Ray를 Scene 뷰에 녹색 광선으로 표현
+        //Debug.DrawRay(ray.origin, ray.direction * 100.0f, Color.green);
     }
     public void Shoot()
     {   //Y축으로 200만큼 Z 축으로 2000만큼의 힘으로 발사시키는 함수
-        Vector3 speed = transform.forward + new Vector3(0, 200, 2000);
+        Vector3 speed = transform.forward * 2000;
         rigid.AddForce(speed);
         
     }
 
-    void OnCollisionEnter(Collision coll)
-    {
-        if (coll.gameObject.layer == LayerMask.NameToLayer("TERRAIN"))
-        {
-            ExpGrenade();
-        }
-    }
+    //void OnCollisionEnter(Collision coll)
+    //{
+    //    ExpGrenade();
+    //}
 
     void ExpGrenade()
     {
@@ -52,7 +60,7 @@ public class GrenadeCtrl : MonoBehaviour
         GameObject explosion = Instantiate(expEffect,
                                this.transform.position, Quaternion.identity);
         Destroy(explosion,
-            explosion.GetComponentInChildren<ParticleSystem>().main.duration + 2.0f);
+            explosion.GetComponentInChildren<ParticleSystem>().main.duration + 1.0f);
 
         //지정한 원점을 중심으로 10.0f 반경 내에 들어와 있는 Collider 객체 추출
         Collider[] colls = Physics.OverlapSphere(this.transform.position, 10.0f);

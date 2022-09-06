@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerCtrl : MonoBehaviour
 {
@@ -9,7 +10,6 @@ public class PlayerCtrl : MonoBehaviour
         idle,
         move,
         run,
-        zoom,
         shot,        
         death
     }
@@ -19,6 +19,8 @@ public class PlayerCtrl : MonoBehaviour
     //탱크의 이동 및 회전 속도를 나타내는 변수
     public float moveSpeed = 20.0f;
     public float rotSpeed = 50.0f;
+
+    bool iszoomOnOff = false;
 
     //참조할 컴포넌트를 할당할 변수
     private Rigidbody rbody;
@@ -60,6 +62,13 @@ public class PlayerCtrl : MonoBehaviour
     public Transform GrenadePos;
     public GameObject Grenade;
 
+    //에임 관련 변수
+    public RectTransform[] aim; //{up,down,left,right}
+
+    float maxaim = 70;
+    float minaim = 25;
+    float curaim = 25;
+
     void Start()
     {
         rbody = GetComponent<Rigidbody>();
@@ -87,20 +96,20 @@ public class PlayerCtrl : MonoBehaviour
         switch (playerstate)
         {
             case PlayerState.idle:
+                Aimpos(false);
                 AnimType("Idle");
                 break;
             case PlayerState.move:
+                maxaim = 50;
                 AnimType("Move");
                 Move(walkSpeed);
                 break;
             case PlayerState.run:
+                maxaim = 70;
                 AnimType("Run");
                 Run();
                 break;
             case PlayerState.shot:
-
-                break;
-            case PlayerState.zoom:
 
                 break;
             case PlayerState.death:
@@ -136,9 +145,16 @@ public class PlayerCtrl : MonoBehaviour
             {
                 isShot = true;
                 //AnimType("Shot");
-                playerstate = PlayerState.shot;
-                Fire();
-                fireDur = 0.1f;
+                if (iszoomOnOff)
+                {
+
+                }
+                else
+                {
+                    playerstate = PlayerState.shot;
+                    Fire();
+                    fireDur = 0.1f;
+                }
             }
             else
             {
@@ -151,20 +167,47 @@ public class PlayerCtrl : MonoBehaviour
     {
         Ray ray = theCamera.ScreenPointToRay(Input.mousePosition);
         //생성된 Ray를 Scene 뷰에 녹색 광선으로 표현
-        Debug.DrawRay(ray.origin, ray.direction * 100.0f, Color.green);
+        Debug.DrawRay(ray.origin, ray.direction * 300.0f, Color.green);
+
+        float x = Random.Range(-curaim / 40, curaim / 40);
+        float yrange = curaim - x;
+        float y = Random.Range(-yrange / 40, yrange / 40);
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity,
                                1 << LayerMask.NameToLayer("TERRAIN")))
         {
-            firePos.LookAt(hit.point);
+            Debug.Log("건물");
+            Vector3 cur = hit.point;
+            cur.x += x;
+            cur.y += y;
+            firePos.LookAt(cur);
+            if (iszoomOnOff)
+            {
+                firePos.LookAt(hit.point);
+            }
             GrenadePos.LookAt(hit.point);
+            //Debug.Log(x);
         }
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity,
-                               1 << LayerMask.NameToLayer("TURRETPICKOBJ")))
+        else
         {
-           firePos.LookAt(hit.point);
-            GrenadePos.LookAt(hit.point);
-        } 
+            Vector3 a_OrgVec = ray.origin + ray.direction * 2000.0f;
+            ray = new Ray(a_OrgVec, -ray.direction);
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity,
+                                         1 << LayerMask.NameToLayer("TURRETPICKOBJ")))
+            {
+                Debug.Log("하늘");
+                Vector3 cur = hit.point;
+                cur.x += x*5;
+                cur.y += y*5;
+                firePos.LookAt(cur);
+                if (iszoomOnOff)
+                {
+                    firePos.LookAt(hit.point);
+                }
+                GrenadePos.LookAt(hit.point);
+            }
+        }
     }
 
     void Fire()
@@ -227,11 +270,67 @@ public class PlayerCtrl : MonoBehaviour
         Vector3 _velocity = (_moveHorizontal + _moveVertical).normalized * speed;
 
         rbody.MovePosition(transform.position + _velocity* Time.deltaTime);
+        Aimpos(true);
+    }
+
+    void Aimpos(bool ismove)
+    {
+        if(ismove)
+        {
+            if (curaim <= maxaim)
+            {
+                curaim += Time.deltaTime*moveSpeed*10;
+            }
+            else
+            {
+                curaim -= Time.deltaTime * moveSpeed * 10;
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                Aimsetpos(aim[i], i);
+            }
+        }
+        else
+        {
+            if(curaim >=minaim)
+            {
+                curaim -= Time.deltaTime * moveSpeed * 10;                
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                Aimsetpos(aim[i], i);
+            }
+        }
+    }
+
+    void Aimsetpos(RectTransform aimobj, int count)
+    {
+        Vector3 curaimpos = aimobj.anchoredPosition;
+        switch (count)
+        {
+            case 0:
+                curaimpos.y = curaim;
+                break;
+            case 1:
+                curaimpos.y = -curaim;
+                break;
+            case 2:
+                curaimpos.x = curaim;
+                break;
+            case 3:
+                curaimpos.x = -curaim;
+                break;
+        }
+        aimobj.anchoredPosition = curaimpos;
+
+        //Debug.Log(curaimpos);
     }
 
     private void Run()
     {
-        Move(walkSpeed + 10);
+        Move(walkSpeed * 2);
     }
 
     private void CameraRotation()
