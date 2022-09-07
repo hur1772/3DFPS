@@ -16,8 +16,8 @@ public class PlayerCtrl : MonoBehaviour
 
     public PlayerState playerstate = PlayerState.idle;
 
-    //탱크의 이동 및 회전 속도를 나타내는 변수
-    public float moveSpeed = 20.0f;
+    //이동 및 회전 속도를 나타내는 변수
+    public float moveSpeed = 10.0f;
     public float rotSpeed = 50.0f;
 
     bool iszoomOnOff = false;
@@ -51,6 +51,13 @@ public class PlayerCtrl : MonoBehaviour
     public MeshRenderer muzzleFlash;
     private RaycastHit hit;
     float fireDur = 0.1f;
+    int curbullet = 30;
+    int maxbullet = 150;
+    public Text maxBullettxt;
+    public Text curBullettxt;
+    bool isReloading = false;
+    float reloadingTime = 2.0f;
+    public RectTransform reloadingbar;
 
     //총알 프리팹
     public GameObject bullet;
@@ -68,6 +75,10 @@ public class PlayerCtrl : MonoBehaviour
     float maxaim = 70;
     float minaim = 25;
     float curaim = 25;
+
+    //줌 관련 변수
+    public GameObject aimGroup;
+    public Image zoom;
 
     void Start()
     {
@@ -105,6 +116,8 @@ public class PlayerCtrl : MonoBehaviour
                 Move(walkSpeed);
                 break;
             case PlayerState.run:
+                if (iszoomOnOff) 
+                    playerstate = PlayerState.move;
                 maxaim = 70;
                 AnimType("Run");
                 Run();
@@ -120,7 +133,8 @@ public class PlayerCtrl : MonoBehaviour
         stateCheck();
         
         CameraRotation();      
-        CharacterRotation();    
+        CharacterRotation();
+        reloadingFunc();
     }
 
     private void AnimType(string anim)
@@ -137,28 +151,28 @@ public class PlayerCtrl : MonoBehaviour
     public void Shot()
     {
         fireDur = fireDur - Time.deltaTime;
-        if (fireDur <= 0.0f)
+        if (curbullet > 0)
         {
-            fireDur = 0.0f;
-            // 마우스 왼쪽 버튼을 클릭했을 때 Fire 함수 호출
-            if (Input.GetMouseButton(0))
+            if (fireDur <= 0.0f)
             {
-                isShot = true;
-                //AnimType("Shot");
-                if (iszoomOnOff)
+                fireDur = 0.0f;
+                // 마우스 왼쪽 버튼을 클릭했을 때 Fire 함수 호출
+                if (Input.GetMouseButton(0))
                 {
-
-                }
-                else
-                {
+                    isReloading = false;
+                    isShot = true;
+                    //AnimType("Shot");
                     playerstate = PlayerState.shot;
                     Fire();
                     fireDur = 0.1f;
+                    curbullet--;
+                    curBullettxt.text = curbullet.ToString();
+                    Debug.Log(curbullet);
                 }
-            }
-            else
-            {
-                isShot = false;
+                else
+                {
+                    isShot = false;
+                }
             }
         }
     }
@@ -176,7 +190,6 @@ public class PlayerCtrl : MonoBehaviour
         if (Physics.Raycast(ray, out hit, Mathf.Infinity,
                                1 << LayerMask.NameToLayer("TERRAIN")))
         {
-            Debug.Log("건물");
             Vector3 cur = hit.point;
             cur.x += x;
             cur.y += y;
@@ -196,7 +209,6 @@ public class PlayerCtrl : MonoBehaviour
             if (Physics.Raycast(ray, out hit, Mathf.Infinity,
                                          1 << LayerMask.NameToLayer("TURRETPICKOBJ")))
             {
-                Debug.Log("하늘");
                 Vector3 cur = hit.point;
                 cur.x += x*5;
                 cur.y += y*5;
@@ -359,6 +371,12 @@ public class PlayerCtrl : MonoBehaviour
 
         if(Input.GetKey(KeyCode.LeftShift))
         {
+            if (iszoomOnOff)
+            {
+                playerstate = PlayerState.move;
+                return;
+            }
+
             isRun = true;
             playerstate = PlayerState.run;
         }
@@ -379,6 +397,57 @@ public class PlayerCtrl : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.G))
         {
             Instantiate(Grenade, GrenadePos.position, GrenadePos.rotation);
+        }
+
+        if(Input.GetMouseButton(1))
+        {
+            aimGroup.SetActive(false);
+            zoom.gameObject.SetActive(true);
+            iszoomOnOff = true;
+        }
+        else//if(Input.GetMouseButtonUp(1))
+        {
+            zoom.gameObject.SetActive(false);
+            aimGroup.SetActive(true);
+            iszoomOnOff = false;
+        }
+
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            isReloading = true;
+        }
+    }
+
+    void reloadingFunc()
+    {
+        if(isReloading)
+        {
+            reloadingTime -= Time.deltaTime;
+            reloadingbar.gameObject.SetActive(true);
+            reloadingbar.sizeDelta = new Vector2(300- (300-(reloadingTime * 100)), 12);
+            if (reloadingTime <= 0)
+            {
+                maxbullet += curbullet;
+                if (maxbullet >= 30)
+                {
+                    maxbullet -= 30;
+                    curbullet = 30;
+                }
+                else
+                {
+                    curbullet = maxbullet;
+                    maxbullet = 0;
+                }
+                reloadingTime = 2.0f;
+                maxBullettxt.text = maxbullet.ToString();
+                curBullettxt.text = curbullet.ToString();
+                isReloading = false;
+            }
+        }
+        else
+        {
+            reloadingTime = 3.0f;
+            reloadingbar.gameObject.SetActive(false);
         }
     }
 
