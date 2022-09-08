@@ -63,8 +63,8 @@ public class GameMgr : MonoBehaviourPunCallbacks
     ExitGames.Client.Photon.Hashtable SitPosInxProps =
                         new ExitGames.Client.Photon.Hashtable();
 
-    [HideInInspector] public static Vector3[] m_Team1Pos = new Vector3[4];
-    [HideInInspector] public static Vector3[] m_Team2Pos = new Vector3[4];
+    [HideInInspector] public static Vector3[] m_Team1Pos = new Vector3[5];
+    [HideInInspector] public static Vector3[] m_Team2Pos = new Vector3[5];
     //--------------- 팀대전 관련 변수들...
 
     //--------------- Round 관련 변수
@@ -92,15 +92,17 @@ public class GameMgr : MonoBehaviourPunCallbacks
     void Awake()
     {
         //--------------- 팀대전 관련 변수 초기화
-        m_Team1Pos[0] = new Vector3(88.4f, 20.0f, 77.9f);
-        m_Team1Pos[1] = new Vector3(61.1f, 20.0f, 88.6f);
+        m_Team1Pos[0] = new Vector3(-17.91f, 1.81f, -1.28f);
+        m_Team1Pos[1] = new Vector3(-16.05f, 1.81f, -1.28f);
         m_Team1Pos[2] = new Vector3(34.6f, 20.0f, 98.7f);
         m_Team1Pos[3] = new Vector3(7.7f, 20.0f, 108.9f);
+        m_Team1Pos[4] = new Vector3(7.7f, 20.0f, 108.9f);
 
         m_Team2Pos[0] = new Vector3(-19.3f, 20.0f, -134.1f);
         m_Team2Pos[1] = new Vector3(-43.1f, 20.0f, -125.6f);
         m_Team2Pos[2] = new Vector3(-66.7f, 20.0f, -117.3f);
         m_Team2Pos[3] = new Vector3(-91.4f, 20.0f, -108.6f);
+        m_Team2Pos[4] = new Vector3(-91.4f, 20.0f, -108.6f);
 
         m_GameState = GameState.GS_Ready;
         //--------------- 팀대전 관련 변수 초기화
