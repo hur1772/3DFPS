@@ -80,6 +80,14 @@ public class PlayerCtrl : MonoBehaviour
     public GameObject aimGroup;
     public Image zoom;
 
+    //게임 상태 관련 변수
+    public bool isCursor = true;
+
+    public Material RedBody;
+    public Material Body;
+
+    public SkinnedMeshRenderer skin;
+
     void Start()
     {
         rbody = GetComponent<Rigidbody>();
@@ -89,12 +97,15 @@ public class PlayerCtrl : MonoBehaviour
 
         //Rigidbody의 무게중심을 낮게 설정
         rbody.centerOfMass = new Vector3(0.0f, -2.5f, 0.0f);
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
     {
+        if(isCursor && GameMgr.m_GameState == GameState.GS_Playing)
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
         if (isGround)
         {
             rbody.drag = 50;
@@ -233,6 +244,13 @@ public class PlayerCtrl : MonoBehaviour
         StartCoroutine(this.ShowMuzzleFlash());
     }
 
+    public void RedSkin()
+    {
+        Material[] svMtrl = skin.materials;
+        svMtrl[2] = RedBody;
+        skin.materials = svMtrl;
+    }
+
     void CreateBullet()
     {
         //if (PhotonInit.isFocus == false) //윈도우 창이 비활성화 되어 있다면...
@@ -359,62 +377,65 @@ public class PlayerCtrl : MonoBehaviour
 
     private void stateCheck()
     {
-        if(Input.GetAxisRaw("Horizontal") != 0|| Input.GetAxisRaw("Vertical") != 0)
+        if (GameMgr.m_GameState == GameState.GS_Playing)
         {
-            if(!isRun)
-                playerstate = PlayerState.move;
-        }
-        else
-        {
-            playerstate = PlayerState.idle;
-        }
-
-        if(Input.GetKey(KeyCode.LeftShift))
-        {
-            if (iszoomOnOff)
+            if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
             {
-                playerstate = PlayerState.move;
-                return;
+                if (!isRun)
+                    playerstate = PlayerState.move;
+            }
+            else
+            {
+                playerstate = PlayerState.idle;
             }
 
-            isRun = true;
-            playerstate = PlayerState.run;
-        }
-        if(Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            isRun = false;
-        }
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                if (iszoomOnOff)
+                {
+                    playerstate = PlayerState.move;
+                    return;
+                }
 
-        if (Input.GetMouseButton(0))
-        {
-            isShot = true;
-        }
-        else
-        {
-            isShot = false;
-        }
+                isRun = true;
+                playerstate = PlayerState.run;
+            }
+            if (Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                isRun = false;
+            }
 
-        if(Input.GetKeyDown(KeyCode.G))
-        {
-            Instantiate(Grenade, GrenadePos.position, GrenadePos.rotation);
-        }
+            if (Input.GetMouseButton(0))
+            {
+                isShot = true;
+            }
+            else
+            {
+                isShot = false;
+            }
 
-        if(Input.GetMouseButton(1))
-        {
-            aimGroup.SetActive(false);
-            zoom.gameObject.SetActive(true);
-            iszoomOnOff = true;
-        }
-        else//if(Input.GetMouseButtonUp(1))
-        {
-            zoom.gameObject.SetActive(false);
-            aimGroup.SetActive(true);
-            iszoomOnOff = false;
-        }
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                Instantiate(Grenade, GrenadePos.position, GrenadePos.rotation);
+            }
 
-        if(Input.GetKeyDown(KeyCode.R))
-        {
-            isReloading = true;
+            if (Input.GetMouseButton(1))
+            {
+                aimGroup.SetActive(false);
+                zoom.gameObject.SetActive(true);
+                iszoomOnOff = true;
+            }
+            else//if(Input.GetMouseButtonUp(1))
+            {
+                zoom.gameObject.SetActive(false);
+                aimGroup.SetActive(true);
+                iszoomOnOff = false;
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                isReloading = true;
+            }
         }
     }
 

@@ -51,7 +51,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     public GameObject scrollTeam2;
 
     [Header("--- Tank Node ---")]
-    public GameObject m_TkNodeItem;
+    public GameObject m_roomItem;
     //--------------------Team Select 부분
 
     ExitGames.Client.Photon.Hashtable m_SelTeamProps =
@@ -94,15 +94,15 @@ public class GameMgr : MonoBehaviourPunCallbacks
         //--------------- 팀대전 관련 변수 초기화
         m_Team1Pos[0] = new Vector3(-17.91f, 1.81f, -1.28f);
         m_Team1Pos[1] = new Vector3(-16.05f, 1.81f, -1.28f);
-        m_Team1Pos[2] = new Vector3(34.6f, 20.0f, 98.7f);
-        m_Team1Pos[3] = new Vector3(7.7f, 20.0f, 108.9f);
-        m_Team1Pos[4] = new Vector3(7.7f, 20.0f, 108.9f);
+        m_Team1Pos[2] = new Vector3(-13.29f, 1.81f, -1.28f);
+        m_Team1Pos[3] = new Vector3(-22.67f, 1.81f, 3.47f);
+        m_Team1Pos[4] = new Vector3(-22.67f, 1.81f, 6.67f);
 
-        m_Team2Pos[0] = new Vector3(-19.3f, 20.0f, -134.1f);
-        m_Team2Pos[1] = new Vector3(-43.1f, 20.0f, -125.6f);
-        m_Team2Pos[2] = new Vector3(-66.7f, 20.0f, -117.3f);
-        m_Team2Pos[3] = new Vector3(-91.4f, 20.0f, -108.6f);
-        m_Team2Pos[4] = new Vector3(-91.4f, 20.0f, -108.6f);
+        m_Team2Pos[0] = new Vector3(89.9f, 1.81f, 28.29f);
+        m_Team2Pos[1] = new Vector3(89.9f, 1.81f, 28.29f);
+        m_Team2Pos[2] = new Vector3(93.61f, 1.81f, 28.29f);
+        m_Team2Pos[3] = new Vector3(95.42f, 1.81f, 22.58f);
+        m_Team2Pos[4] = new Vector3(95.42f, 1.81f, 18.62f);
 
         m_GameState = GameState.GS_Ready;
         //--------------- 팀대전 관련 변수 초기화
@@ -241,8 +241,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     void CreateTank()
     {
         float pos = Random.Range(-100.0f, 100.0f);
-        PhotonNetwork.Instantiate("Tank",
-            new Vector3(pos, 20.0f, pos), Quaternion.identity, 0);
+        PhotonNetwork.Instantiate("Player",new Vector3(pos, 20.0f, pos), Quaternion.identity, 0);
     }
 
     //룸 접속자 정보를 조회하는 함수
@@ -305,7 +304,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     //PhotonNetwork.LeaveRoom(); 성공했을 때 
     public override void OnLeftRoom()  
     {
-        SceneManager.LoadScene("scLobby");
+        SceneManager.LoadScene("TitleScene");
     }
 
     [PunRPC]
@@ -342,19 +341,19 @@ public class GameMgr : MonoBehaviourPunCallbacks
 
     bool IsDifferentList() //true면 다르다는 뜻 false면 같다는 뜻
     {
-        GameObject[] a_TkNodeItems = GameObject.FindGameObjectsWithTag("TKNODE_ITEM");
+        GameObject[] a_RoomItems = GameObject.FindGameObjectsWithTag("ROOM_ITEM");
 
-        if (a_TkNodeItems == null)
+        if (a_RoomItems == null)
             return true;
 
-        if (PhotonNetwork.PlayerList.Length != a_TkNodeItems.Length)
+        if (PhotonNetwork.PlayerList.Length != a_RoomItems.Length)
             return true;
 
         foreach (Player a_RefPlayer in PhotonNetwork.PlayerList)
         {
             bool a_FindNode = false;
             PlayerNodeItem PlayerData = null;
-            foreach (GameObject a_Node in a_TkNodeItems)
+            foreach (GameObject a_Node in a_RoomItems)
             {
                 PlayerData = a_Node.GetComponent<PlayerNodeItem>();
                 if (PlayerData == null)
@@ -383,28 +382,28 @@ public class GameMgr : MonoBehaviourPunCallbacks
 
     void RefreshPhotonTeam()
     {
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("TKNODE_ITEM"))
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("ROOM_ITEM"))
         {
             Destroy(obj);
         }
 
-        GameObject[] a_tanks = GameObject.FindGameObjectsWithTag("TANK");
+        GameObject[] a_Player = GameObject.FindGameObjectsWithTag("Player");
 
         string a_TeamKind = "blue";
-        GameObject a_TkNode = null;
+        GameObject a_roomNode = null;
         foreach (Player a_RefPlayer in PhotonNetwork.PlayerList)
         {
             a_TeamKind = ReceiveSelTeam(a_RefPlayer);
-            a_TkNode = (GameObject)Instantiate(m_TkNodeItem);
+            a_roomNode = (GameObject)Instantiate(m_roomItem);
 
             //팀이 뭐냐?에 따라서 스크롤 뷰를 분기 해 준다.
             if (a_TeamKind == "blue")
-                a_TkNode.transform.SetParent(scrollTeam1.transform, false);
+                a_roomNode.transform.SetParent(scrollTeam1.transform, false);
             else if (a_TeamKind == "black")
-                a_TkNode.transform.SetParent(scrollTeam2.transform, false);
+                a_roomNode.transform.SetParent(scrollTeam2.transform, false);
 
             //생성한 RoomItem에 표시하기 위한 텍스트 정보 전달
-            PlayerNodeItem PlayerData = a_TkNode.GetComponent<PlayerNodeItem>();
+            PlayerNodeItem PlayerData = a_roomNode.GetComponent<PlayerNodeItem>();
             //텍스트 정보를 표시
             if (PlayerData != null)
             {
@@ -417,7 +416,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
             }
 
             //이름표 색깔 바꾸기
-            ChangeTankNameColor(a_tanks, a_RefPlayer.ActorNumber, a_TeamKind);
+            ChangeTankNameColor(a_Player, a_RefPlayer.ActorNumber, a_TeamKind);
 
         } //foreach (Player a_RefPlayer in PhotonNetwork.PlayerList)
 
@@ -748,7 +747,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
         Player[] players = PhotonNetwork.PlayerList; //using Photon.Realtime;
         string PlayerTeam = "blue";
 
-        GameObject[] tanks = GameObject.FindGameObjectsWithTag("TANK");
+        GameObject[] tanks = GameObject.FindGameObjectsWithTag("Player");
 
         foreach (Player _player in players)
         {
@@ -859,7 +858,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
         //모든탱크 GS_Ready 상태일 때 모든 탱크 대기 상태로 만들기...
         if (m_OldState != GameState.GS_Ready && m_GameState == GameState.GS_Ready)
         {
-            GameObject[] tanks = GameObject.FindGameObjectsWithTag("TANK");
+            GameObject[] tanks = GameObject.FindGameObjectsWithTag("Player");
             foreach (GameObject tank in tanks)
             {
                 PlayerDamage playerDamage = tank.GetComponent<PlayerDamage>();
@@ -882,7 +881,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
         int a_CurHP = 0;
         string a_PlrTeam = "blue"; //Player Team
 
-        GameObject[] tanks = GameObject.FindGameObjectsWithTag("TANK");
+        GameObject[] tanks = GameObject.FindGameObjectsWithTag("Player");
 
         Player[] players = PhotonNetwork.PlayerList; //using Photon.Realtime;
         foreach (Player _player in players)
