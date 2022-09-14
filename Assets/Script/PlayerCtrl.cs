@@ -101,51 +101,54 @@ public class PlayerCtrl : MonoBehaviour
 
     void Update()
     {
-        if(isCursor && GameMgr.m_GameState == GameState.GS_Playing)
+        if (GameMgr.m_GameState == GameState.GS_Playing)
         {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
+            if (isCursor && GameMgr.m_GameState == GameState.GS_Playing)
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            if (isGround)
+            {
+                rbody.drag = 50;
+            }
+            else
+                rbody.drag = -5;
+
+            Shot();
+
+            switch (playerstate)
+            {
+                case PlayerState.idle:
+                    Aimpos(false);
+                    AnimType("Idle");
+                    break;
+                case PlayerState.move:
+                    maxaim = 50;
+                    AnimType("Move");
+                    Move(walkSpeed);
+                    break;
+                case PlayerState.run:
+                    if (iszoomOnOff)
+                        playerstate = PlayerState.move;
+                    maxaim = 70;
+                    AnimType("Run");
+                    Run();
+                    break;
+                case PlayerState.shot:
+
+                    break;
+                case PlayerState.death:
+
+                    break;
+            }
+            FirePosCheck();
+            stateCheck();
+
+            CameraRotation();
+            CharacterRotation();
+            reloadingFunc();
         }
-        if (isGround)
-        {
-            rbody.drag = 50;
-        }
-        else
-            rbody.drag = -5;
-
-        Shot();
-
-        switch (playerstate)
-        {
-            case PlayerState.idle:
-                Aimpos(false);
-                AnimType("Idle");
-                break;
-            case PlayerState.move:
-                maxaim = 50;
-                AnimType("Move");
-                Move(walkSpeed);
-                break;
-            case PlayerState.run:
-                if (iszoomOnOff) 
-                    playerstate = PlayerState.move;
-                maxaim = 70;
-                AnimType("Run");
-                Run();
-                break;
-            case PlayerState.shot:
-
-                break;
-            case PlayerState.death:
-
-                break;
-        }
-        FirePosCheck();
-        stateCheck();
-        
-        CameraRotation();      
-        CharacterRotation();
-        reloadingFunc();
     }
 
     private void AnimType(string anim)
@@ -305,34 +308,34 @@ public class PlayerCtrl : MonoBehaviour
 
     void Aimpos(bool ismove)
     {
-        if(ismove)
-        {
-            if (curaim <= maxaim)
-            {
-                curaim += Time.deltaTime*moveSpeed*10;
-            }
-            else
-            {
-                curaim -= Time.deltaTime * moveSpeed * 10;
-            }
+        //if (ismove)
+        //{
+        //    if (curaim <= maxaim)
+        //    {
+        //        curaim += Time.deltaTime * moveSpeed * 10;
+        //    }
+        //    else
+        //    {
+        //        curaim -= Time.deltaTime * moveSpeed * 10;
+        //    }
 
-            for (int i = 0; i < 4; i++)
-            {
-                Aimsetpos(aim[i], i);
-            }
-        }
-        else
-        {
-            if(curaim >=minaim)
-            {
-                curaim -= Time.deltaTime * moveSpeed * 10;                
-            }
+        //    for (int i = 0; i < 4; i++)
+        //    {
+        //        Aimsetpos(aim[i], i);
+        //    }
+        //}
+        //else
+        //{
+        //    if (curaim >= minaim)
+        //    {
+        //        curaim -= Time.deltaTime * moveSpeed * 10;
+        //    }
 
-            for (int i = 0; i < 4; i++)
-            {
-                Aimsetpos(aim[i], i);
-            }
-        }
+        //    for (int i = 0; i < 4; i++)
+        //    {
+        //        Aimsetpos(aim[i], i);
+        //    }
+        //}
     }
 
     void Aimsetpos(RectTransform aimobj, int count)
@@ -427,8 +430,8 @@ public class PlayerCtrl : MonoBehaviour
             }
             else//if(Input.GetMouseButtonUp(1))
             {
-                zoom.gameObject.SetActive(false);
-                aimGroup.SetActive(true);
+                //zoom.gameObject.SetActive(false);
+                //aimGroup.SetActive(true);
                 iszoomOnOff = false;
             }
 
@@ -468,7 +471,7 @@ public class PlayerCtrl : MonoBehaviour
         else
         {
             reloadingTime = 3.0f;
-            reloadingbar.gameObject.SetActive(false);
+            //reloadingbar.gameObject.SetActive(false);
         }
     }
 

@@ -221,7 +221,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
         {
             Team1Panel.SetActive(false);
             Team2Panel.SetActive(false);
-            m_WaitTmText.gameObject.SetActive(false);
+            //m_WaitTmText.gameObject.SetActive(false);
         }//if (m_GameState == GameState.GS_Playing)
 
         WinLoseObserver();
@@ -240,7 +240,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     //탱크를 생성하는 함수 
     void CreateTank()
     {
-        float pos = Random.Range(-100.0f, 100.0f);
+        float pos = Random.Range(-50.0f, 50.0f);
         PhotonNetwork.Instantiate("Player",new Vector3(pos, 20.0f, pos), Quaternion.identity, 0);
     }
 
@@ -653,7 +653,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
 
                     Team1Panel.SetActive(false);
                     Team2Panel.SetActive(false);
-                    m_WaitTmText.gameObject.SetActive(false);
+                    //m_WaitTmText.gameObject.SetActive(false);
 
                     m_ChekWinTime = 2.0f;
                     m_GoWaitGame = 0.0f;

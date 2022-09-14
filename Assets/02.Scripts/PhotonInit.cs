@@ -224,6 +224,7 @@ public class PhotonInit : MonoBehaviourPunCallbacks  //MonoBehaviour
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
+        Debug.Log(roomList);
         int roomCount = roomList.Count;
         for (int i = 0; i < roomCount; i++)
         {
@@ -347,7 +348,7 @@ public class PhotonInit : MonoBehaviourPunCallbacks  //MonoBehaviour
         room.transform.SetParent(scrollContents.transform, false);
 
         //생성한 RoomItem에 표시하기 위한 텍스트 정보 전달
-        RoomData roomData = room.GetComponent<RoomData>();
+        RoomData roomData = room.GetComponent<RoomData>();;
         roomData.roomName = a_RmImfo.Name;
         roomData.connectPlayer = a_RmImfo.PlayerCount;
         roomData.maxPlayer = a_RmImfo.MaxPlayers;

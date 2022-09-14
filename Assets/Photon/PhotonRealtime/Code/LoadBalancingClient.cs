@@ -3352,17 +3352,14 @@ namespace Photon.Realtime
                         this.AuthValues = new AuthenticationValues();
                     }
 
-                    this.AuthValues.Token = photonEvent[ParameterCode.Token];
+                    this.AuthValues.Token = photonEvent[ParameterCode.Token] as string;
                     this.tokenCache = this.AuthValues.Token;
                     break;
 
             }
 
             this.UpdateCallbackTargets();
-            if (this.EventReceived != null)
-            {
-                this.EventReceived(photonEvent);
-            }
+            if (this.EventReceived != null) this.EventReceived(photonEvent);
         }
 
         /// <summary>In Photon 4, "raw messages" will get their own callback method in the interface. Not used yet.</summary>
