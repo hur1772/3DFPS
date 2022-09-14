@@ -341,7 +341,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
 
     bool IsDifferentList() //true면 다르다는 뜻 false면 같다는 뜻
     {
-        GameObject[] a_RoomItems = GameObject.FindGameObjectsWithTag("ROOM_ITEM");
+        GameObject[] a_RoomItems = GameObject.FindGameObjectsWithTag("PLAYERNODE_ITEM");
 
         if (a_RoomItems == null)
             return true;
@@ -382,7 +382,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
 
     void RefreshPhotonTeam()
     {
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("ROOM_ITEM"))
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("PLAYERNODE_ITEM"))
         {
             Destroy(obj);
         }

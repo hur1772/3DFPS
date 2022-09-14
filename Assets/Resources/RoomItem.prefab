@@ -170,7 +170,7 @@ GameObject:
   - component: {fileID: 3285273293217239792}
   - component: {fileID: 189452484218442502}
   - component: {fileID: 5131238041268782795}
-  - component: {fileID: -5777399129481074994}
+  - component: {fileID: 6247200264004033387}
   m_Layer: 5
   m_Name: RoomItem
   m_TagString: ROOM_ITEM
@@ -281,7 +281,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &-5777399129481074994
+--- !u!114 &6247200264004033387
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -290,11 +290,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8053514224958055872}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eabf8eacce2270c4fa710dcbf98e46b0, type: 3}
+  m_Script: {fileID: 11500000, guid: c70598c563dc88141be22245fdaf8b8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UniqID: -1
-  m_TeamKind: 
-  m_IamReady: 0
-  TextTankName: {fileID: 0}
-  TextStateInfo: {fileID: 0}
+  roomName: 
+  connectPlayer: 0
+  maxPlayer: 0
+  textRoomName: {fileID: 4884934116742276049}
+  textConnectInfo: {fileID: 1535625787477061796}
+  ReadyState: 

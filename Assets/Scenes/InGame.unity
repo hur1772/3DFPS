@@ -58600,7 +58600,7 @@ MonoBehaviour:
   m_Team2ToTeam1: {fileID: 1456158662}
   m_Team2Ready: {fileID: 513299757}
   scrollTeam2: {fileID: 831281560}
-  m_roomItem: {fileID: 8053514224958055872, guid: 8e621c1df5ba3fb46a2c8e018176d2f7, type: 3}
+  m_roomItem: {fileID: 6401251409360863207, guid: 34495d23c6eab234299cdf2f6733455a, type: 3}
   m_WaitTmText: {fileID: 0}
   m_WinLossCount: {fileID: 1861887571}
   m_GameEndText: {fileID: 0}

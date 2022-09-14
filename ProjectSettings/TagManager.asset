@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - BULLET
+  - ROOM_ITEM
+  - TKNODE_ITEM
+  - PLAYERNODE_ITEM
   layers:
   - Default
   - TransparentFX
