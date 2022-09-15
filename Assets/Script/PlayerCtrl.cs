@@ -20,13 +20,12 @@ public class PlayerCtrl : MonoBehaviour
     public float moveSpeed = 10.0f;
     public float rotSpeed = 50.0f;
 
-    bool iszoomOnOff = false;
+    public bool iszoomOnOff = false;
 
     //참조할 컴포넌트를 할당할 변수
-    private Rigidbody rbody;
+    public Rigidbody rbody;
 
-    [SerializeField]
-    private float walkSpeed;
+    public float walkSpeed;
 
     [SerializeField]
     private float lookSensitivity;
@@ -43,7 +42,7 @@ public class PlayerCtrl : MonoBehaviour
 
     bool isGround = true;
 
-    bool isRun = false;
+    public bool isRun = false;
 
     bool isShot = false;
 
@@ -88,6 +87,8 @@ public class PlayerCtrl : MonoBehaviour
 
     public SkinnedMeshRenderer skin;
 
+    PlayerMove playerMove;
+
     void Start()
     {
         rbody = GetComponent<Rigidbody>();
@@ -97,13 +98,33 @@ public class PlayerCtrl : MonoBehaviour
 
         //Rigidbody의 무게중심을 낮게 설정
         rbody.centerOfMass = new Vector3(0.0f, -2.5f, 0.0f);
+        maxBullettxt = GameObject.Find("maxbullet").GetComponent<Text>();
+        curBullettxt = GameObject.Find("curbullet").GetComponent<Text>();
+        aimGroup = GameObject.Find("AimGroup");
+        aim = aimGroup.GetComponentsInChildren<RectTransform>();
+        zoom = GameObject.Find("zoom").GetComponent<Image>();
+        reloadingbar = GameObject.Find("reloadingbar").GetComponent<RectTransform>();
+
+        playerMove = GetComponent<PlayerMove>();
     }
 
     void Update()
     {
+        if(GameMgr.m_GameState == GameState.GS_GameEnd)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
         if (GameMgr.m_GameState == GameState.GS_Playing)
         {
-            if (isCursor && GameMgr.m_GameState == GameState.GS_Playing)
+            if (theCamera.enabled == false)
+            {
+                Camera maincam = Camera.main;
+                maincam.enabled = false;
+                theCamera.enabled = true;
+            }
+
+            if (isCursor)
             {
                 Cursor.visible = false;
                 Cursor.lockState = CursorLockMode.Locked;
@@ -126,14 +147,14 @@ public class PlayerCtrl : MonoBehaviour
                 case PlayerState.move:
                     maxaim = 50;
                     AnimType("Move");
-                    Move(walkSpeed);
+                    playerMove.Move(walkSpeed);
                     break;
                 case PlayerState.run:
                     if (iszoomOnOff)
                         playerstate = PlayerState.move;
                     maxaim = 70;
                     AnimType("Run");
-                    Run();
+                    playerMove.Run();
                     break;
                 case PlayerState.shot:
 
@@ -286,56 +307,37 @@ public class PlayerCtrl : MonoBehaviour
         muzzleFlash.enabled = false;
     }
 
-    private void Move(float speed)
+    
+    public void Aimpos(bool ismove)
     {
-    //    h = Input.GetAxis("Horizontal");
-    //    v = Input.GetAxis("Vertical");
+        if (ismove)
+        {
+            if (curaim <= maxaim)
+            {
+                curaim += Time.deltaTime * moveSpeed * 10;
+            }
+            else
+            {
+                curaim -= Time.deltaTime * moveSpeed * 10;
+            }
 
-    //    //회전과 이동처리
-    //    tr.Rotate(Vector3.up * rotSpeed * h * Time.deltaTime);
-    //    tr.Translate(Vector3.forward * v * moveSpeed * Time.deltaTime);
+            for (int i = 0; i < 4; i++)
+            {
+                Aimsetpos(aim[i], i);
+            }
+        }
+        else
+        {
+            if (curaim >= minaim)
+            {
+                curaim -= Time.deltaTime * moveSpeed * 10;
+            }
 
-        float _moveDirX = Input.GetAxisRaw("Horizontal");
-        float _moveDirZ = Input.GetAxisRaw("Vertical");
-        Vector3 _moveHorizontal = transform.right * _moveDirX;
-        Vector3 _moveVertical = transform.forward * _moveDirZ;
-
-        Vector3 _velocity = (_moveHorizontal + _moveVertical).normalized * speed;
-
-        rbody.MovePosition(transform.position + _velocity* Time.deltaTime);
-        Aimpos(true);
-    }
-
-    void Aimpos(bool ismove)
-    {
-        //if (ismove)
-        //{
-        //    if (curaim <= maxaim)
-        //    {
-        //        curaim += Time.deltaTime * moveSpeed * 10;
-        //    }
-        //    else
-        //    {
-        //        curaim -= Time.deltaTime * moveSpeed * 10;
-        //    }
-
-        //    for (int i = 0; i < 4; i++)
-        //    {
-        //        Aimsetpos(aim[i], i);
-        //    }
-        //}
-        //else
-        //{
-        //    if (curaim >= minaim)
-        //    {
-        //        curaim -= Time.deltaTime * moveSpeed * 10;
-        //    }
-
-        //    for (int i = 0; i < 4; i++)
-        //    {
-        //        Aimsetpos(aim[i], i);
-        //    }
-        //}
+            for (int i = 0; i < 4; i++)
+            {
+                Aimsetpos(aim[i], i);
+            }
+        }
     }
 
     void Aimsetpos(RectTransform aimobj, int count)
@@ -361,10 +363,7 @@ public class PlayerCtrl : MonoBehaviour
         //Debug.Log(curaimpos);
     }
 
-    private void Run()
-    {
-        Move(walkSpeed * 2);
-    }
+   
 
     private void CameraRotation()
     {
@@ -382,32 +381,7 @@ public class PlayerCtrl : MonoBehaviour
     {
         if (GameMgr.m_GameState == GameState.GS_Playing)
         {
-            if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
-            {
-                if (!isRun)
-                    playerstate = PlayerState.move;
-            }
-            else
-            {
-                playerstate = PlayerState.idle;
-            }
-
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                if (iszoomOnOff)
-                {
-                    playerstate = PlayerState.move;
-                    return;
-                }
-
-                isRun = true;
-                playerstate = PlayerState.run;
-            }
-            if (Input.GetKeyUp(KeyCode.LeftShift))
-            {
-                isRun = false;
-            }
-
+            
             if (Input.GetMouseButton(0))
             {
                 isShot = true;
@@ -425,13 +399,13 @@ public class PlayerCtrl : MonoBehaviour
             if (Input.GetMouseButton(1))
             {
                 aimGroup.SetActive(false);
-                zoom.gameObject.SetActive(true);
+                zoom.enabled = true;
                 iszoomOnOff = true;
             }
             else//if(Input.GetMouseButtonUp(1))
             {
-                //zoom.gameObject.SetActive(false);
-                //aimGroup.SetActive(true);
+                zoom.enabled = false;
+                aimGroup.SetActive(true);
                 iszoomOnOff = false;
             }
 
@@ -447,7 +421,7 @@ public class PlayerCtrl : MonoBehaviour
         if(isReloading)
         {
             reloadingTime -= Time.deltaTime;
-            reloadingbar.gameObject.SetActive(true);
+            reloadingbar.gameObject.GetComponent<Image>().enabled = true;
             reloadingbar.sizeDelta = new Vector2(300- (300-(reloadingTime * 100)), 12);
             if (reloadingTime <= 0)
             {
@@ -471,7 +445,7 @@ public class PlayerCtrl : MonoBehaviour
         else
         {
             reloadingTime = 3.0f;
-            //reloadingbar.gameObject.SetActive(false);
+            reloadingbar.gameObject.GetComponent<Image>().enabled = false;
         }
     }
 
