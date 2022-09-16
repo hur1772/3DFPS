@@ -20427,12 +20427,15 @@ MonoBehaviour:
   playerstate: 0
   moveSpeed: 20
   rotSpeed: 25
-  walkSpeed: 20
+  iszoomOnOff: 0
+  rbody: {fileID: 0}
+  walkSpeed: 5
   lookSensitivity: 10
   cameraRotationLimit: 50
   theCamera: {fileID: 9048724338352382566}
   RightArm: {fileID: 2038581915}
   animator: {fileID: 0}
+  isRun: 0
   muzzleFlash: {fileID: 1545591491}
   maxBullettxt: {fileID: 544077072}
   curBullettxt: {fileID: 1871360037}

@@ -132,6 +132,10 @@ public class GameMgr : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
+        Application.targetFrameRate = 60; //실행 프레임 속도 60프레임으로 고정 시키기.. 코드
+
+        QualitySettings.vSyncCount = 0; //모니터 주사율(플레임율)이 다른 컴퓨터일 경우 캐릭터 조작시 빠르게 움직일 수 있다.
+
         //-- TeamSetting
         //내가 입장할때 나를 포함한 다른 사람들에게 내 등장을 알린다. 
         //-- 팀1 버튼 처리
@@ -226,7 +230,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
             //m_WaitTmText.gameObject.SetActive(false);
         }//if (m_GameState == GameState.GS_Playing)
 
-        WinLoseObserver();
+        //WinLoseObserver();
     } //void Update()
 
     void EnterChat()
@@ -242,7 +246,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     //탱크를 생성하는 함수 
     void CreateTank()
     {
-        float pos = Random.Range(-50.0f, 50.0f);
+        float pos = Random.Range(0.0f, 0.0f);
         PhotonNetwork.Instantiate("Player",new Vector3(pos, 20.0f, pos), Quaternion.identity, 0);
     }
 

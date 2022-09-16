@@ -25,7 +25,7 @@ public class PlayerCtrl : MonoBehaviour
     //참조할 컴포넌트를 할당할 변수
     public Rigidbody rbody;
 
-    public float walkSpeed;
+    public float walkSpeed = 1.0f;
 
     [SerializeField]
     private float lookSensitivity;
@@ -89,6 +89,8 @@ public class PlayerCtrl : MonoBehaviour
 
     PlayerMove playerMove;
 
+    GameObject maincam;
+
     void Start()
     {
         rbody = GetComponent<Rigidbody>();
@@ -104,7 +106,7 @@ public class PlayerCtrl : MonoBehaviour
         aim = aimGroup.GetComponentsInChildren<RectTransform>();
         zoom = GameObject.Find("zoom").GetComponent<Image>();
         reloadingbar = GameObject.Find("reloadingbar").GetComponent<RectTransform>();
-
+        maincam = GameObject.Find("Main Camera");
         playerMove = GetComponent<PlayerMove>();
     }
 
@@ -117,10 +119,15 @@ public class PlayerCtrl : MonoBehaviour
         }
         if (GameMgr.m_GameState == GameState.GS_Playing)
         {
-            if (theCamera.enabled == false)
+            Debug.Log(maincam);
+            if (maincam.activeSelf == true)
             {
-                Camera maincam = Camera.main;
-                maincam.enabled = false;
+                maincam.SetActive(false);
+                theCamera.enabled = true;
+            }
+            else if (theCamera.enabled == false)
+            {
+                maincam.SetActive(false);
                 theCamera.enabled = true;
             }
 

@@ -1271,7 +1271,7 @@ MonoBehaviour:
   rotSpeed: 25
   iszoomOnOff: 0
   rbody: {fileID: 0}
-  walkSpeed: 20
+  walkSpeed: 5
   lookSensitivity: 10
   cameraRotationLimit: 50
   theCamera: {fileID: 566142340}
