@@ -1269,8 +1269,9 @@ MonoBehaviour:
   playerstate: 0
   moveSpeed: 20
   rotSpeed: 25
+  playerTr: {fileID: 9159628168234188440}
   iszoomOnOff: 0
-  rbody: {fileID: 0}
+  rbody: {fileID: 9159628169663567103}
   walkSpeed: 5
   lookSensitivity: 10
   cameraRotationLimit: 50
@@ -1297,6 +1298,7 @@ MonoBehaviour:
   RedBody: {fileID: 0}
   Body: {fileID: 0}
   skin: {fileID: 0}
+  maincam: {fileID: 0}
 --- !u!114 &6748054436180879147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1345,6 +1347,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6903f93a66d64454c920702bf8980e29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerCtrl: {fileID: 9159628169663567100}
 --- !u!1 &9159628168234345146
 GameObject:
   m_ObjectHideFlags: 0

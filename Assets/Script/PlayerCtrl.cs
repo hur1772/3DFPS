@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class PlayerCtrl : MonoBehaviour
+public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
 {
     public enum PlayerState
     {
@@ -19,6 +21,7 @@ public class PlayerCtrl : MonoBehaviour
     //이동 및 회전 속도를 나타내는 변수
     public float moveSpeed = 10.0f;
     public float rotSpeed = 50.0f;
+    public Transform playerTr;
 
     public bool iszoomOnOff = false;
 
@@ -35,7 +38,7 @@ public class PlayerCtrl : MonoBehaviour
     private float currentCameraRotationX;
 
     [SerializeField]
-    private Camera theCamera;
+    public Camera theCamera;
     public GameObject RightArm;
 
     [HideInInspector]public Animator animator;
@@ -89,11 +92,22 @@ public class PlayerCtrl : MonoBehaviour
 
     PlayerMove playerMove;
 
-    GameObject maincam;
+    public GameObject maincam;
+
+    private PhotonView pv = null;
+
+
+    void Awake()
+    {
+        pv = GetComponent<PhotonView>();
+
+        //PhotonView Observed Components 속성에 TankMove 스크립트를 연결
+        pv.ObservedComponents[0] = this;
+    }
 
     void Start()
     {
-        rbody = GetComponent<Rigidbody>();
+        //rbody = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
 
         muzzleFlash.enabled = false;
@@ -112,70 +126,61 @@ public class PlayerCtrl : MonoBehaviour
 
     void Update()
     {
-        if(GameMgr.m_GameState == GameState.GS_GameEnd)
+        if (pv.IsMine)
         {
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
-        }
-        if (GameMgr.m_GameState == GameState.GS_Playing)
-        {
-            Debug.Log(maincam);
-            if (maincam.activeSelf == true)
+            if (GameMgr.m_GameState == GameState.GS_GameEnd)
             {
-                maincam.SetActive(false);
-                theCamera.enabled = true;
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
             }
-            else if (theCamera.enabled == false)
+            if (GameMgr.m_GameState == GameState.GS_Playing)
             {
-                maincam.SetActive(false);
-                theCamera.enabled = true;
+                if (isCursor)
+                {
+                    Cursor.visible = false;
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
+                if (isGround)
+                {
+                    rbody.drag = 50;
+                }
+                else
+                    rbody.drag = -5;
+
+                Shot();
+
+                switch (playerstate)
+                {
+                    case PlayerState.idle:
+                        Aimpos(false);
+                        AnimType("Idle");
+                        break;
+                    case PlayerState.move:
+                        maxaim = 50;
+                        AnimType("Move");
+                        playerMove.Move(walkSpeed);
+                        break;
+                    case PlayerState.run:
+                        if (iszoomOnOff)
+                            playerstate = PlayerState.move;
+                        maxaim = 70;
+                        AnimType("Run");
+                        playerMove.Run();
+                        break;
+                    case PlayerState.shot:
+
+                        break;
+                    case PlayerState.death:
+
+                        break;
+                }
+                FirePosCheck();
+                stateCheck();
+
+                CameraRotation();
+                CharacterRotation();
+                reloadingFunc();
             }
-
-            if (isCursor)
-            {
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.Locked;
-            }
-            if (isGround)
-            {
-                rbody.drag = 50;
-            }
-            else
-                rbody.drag = -5;
-
-            Shot();
-
-            switch (playerstate)
-            {
-                case PlayerState.idle:
-                    Aimpos(false);
-                    AnimType("Idle");
-                    break;
-                case PlayerState.move:
-                    maxaim = 50;
-                    AnimType("Move");
-                    playerMove.Move(walkSpeed);
-                    break;
-                case PlayerState.run:
-                    if (iszoomOnOff)
-                        playerstate = PlayerState.move;
-                    maxaim = 70;
-                    AnimType("Run");
-                    playerMove.Run();
-                    break;
-                case PlayerState.shot:
-
-                    break;
-                case PlayerState.death:
-
-                    break;
-            }
-            FirePosCheck();
-            stateCheck();
-
-            CameraRotation();
-            CharacterRotation();
-            reloadingFunc();
         }
     }
 
@@ -209,7 +214,6 @@ public class PlayerCtrl : MonoBehaviour
                     fireDur = 0.1f;
                     curbullet--;
                     curBullettxt.text = curbullet.ToString();
-                    Debug.Log(curbullet);
                 }
                 else
                 {
@@ -268,6 +272,7 @@ public class PlayerCtrl : MonoBehaviour
     {
         //동적으로 총알을 생성하는 함수
         CreateBullet();
+        pv.RPC("CreateBullet", RpcTarget.Others, null);
 
         //사운드 발생 함수
         //source.PlayOneShot(fireSfx, 0.2f);
@@ -282,6 +287,7 @@ public class PlayerCtrl : MonoBehaviour
         skin.materials = svMtrl;
     }
 
+    [PunRPC]
     void CreateBullet()
     {
         //if (PhotonInit.isFocus == false) //윈도우 창이 비활성화 되어 있다면...
@@ -479,5 +485,9 @@ public class PlayerCtrl : MonoBehaviour
         {
             isGround = false;
         }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
     }
 }

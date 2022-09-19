@@ -186,7 +186,6 @@ public class GameMgr : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(m_GameState);
         //게임 플로어를 돌려도 되는 상태인지 확인한다.
         if (IsGamePossible() == false) 
             return;
@@ -630,7 +629,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
             {
                 PhotonNetwork.CurrentRoom.IsOpen = false;
                 //게임이 시작되면 다른 유저 들어오지 못하도록 막는 부분
-                //PhotonNetwork.CurrentRoom.IsVisible = false; 
+                PhotonNetwork.CurrentRoom.IsVisible = false; 
                 //로비에서 방 목록에서도 보이지 않게 하기
             }
 

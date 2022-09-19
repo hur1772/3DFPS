@@ -20427,6 +20427,7 @@ MonoBehaviour:
   playerstate: 0
   moveSpeed: 20
   rotSpeed: 25
+  playerTr: {fileID: 0}
   iszoomOnOff: 0
   rbody: {fileID: 0}
   walkSpeed: 5
@@ -20455,6 +20456,7 @@ MonoBehaviour:
   RedBody: {fileID: 2100000, guid: a582577cd9d08dc4aa6b6dea62f8ade6, type: 2}
   Body: {fileID: 2100000, guid: 6148be3a64bcc4b47b50eb4e6b2f2a4f, type: 2}
   skin: {fileID: 2035468267}
+  maincam: {fileID: 0}
 --- !u!54 &749878522
 Rigidbody:
   m_ObjectHideFlags: 0
