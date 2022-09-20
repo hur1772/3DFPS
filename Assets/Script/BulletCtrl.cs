@@ -35,22 +35,7 @@ public class BulletCtrl : MonoBehaviour
     //충돌이 시작할 때 발생하는 이벤트
     void OnCollisionEnter(Collision coll)
     {
-        if (coll.gameObject.name.Contains("Player") == true)
-            return;
-
-        if (coll.gameObject.name.Contains("Barrel") == true)
-            return;
-
-        if (coll.gameObject.name.Contains("Monster_") == true)
-            return;
-
-        if (coll.collider.tag == "SideWall")
-            return;
-
         if (coll.collider.tag == "BULLET")
-            return;
-
-        if (coll.collider.tag == "E_BULLET")
             return;
 
         //스파크 파티클을 동적으로 생성

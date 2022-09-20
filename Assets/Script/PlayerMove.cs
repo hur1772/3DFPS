@@ -62,7 +62,7 @@ public class PlayerMove : MonoBehaviourPunCallbacks, IPunObservable
                 if (playerCtrl.maincam.activeSelf == true)
                 {
                     playerCtrl.maincam.SetActive(false);
-                    playerCtrl.theCamera.enabled = true;
+                    playerCtrl.theCamera.gameObject.SetActive(true);
                 }
             }
 

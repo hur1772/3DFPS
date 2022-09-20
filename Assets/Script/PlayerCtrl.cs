@@ -135,6 +135,8 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
             }
             if (GameMgr.m_GameState == GameState.GS_Playing)
             {
+                if (muzzleFlash.enabled != false)
+                    muzzleFlash.enabled = false;
                 if (isCursor)
                 {
                     Cursor.visible = false;
