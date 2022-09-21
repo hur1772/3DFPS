@@ -17,6 +17,7 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public PlayerState playerstate = PlayerState.idle;
+    public PlayerState Netplayerstate = PlayerState.idle;
 
     //이동 및 회전 속도를 나타내는 변수
     public float moveSpeed = 10.0f;
@@ -71,6 +72,8 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
     public Transform GrenadePos;
     public GameObject Grenade;
 
+    int GrenadeCount = 2;
+
     //에임 관련 변수
     public RectTransform[] aim; //{up,down,left,right}
 
@@ -96,13 +99,14 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
 
     private PhotonView pv = null;
 
+    Vector3 DeathArm = new Vector3(0.17f,0.24f,-1.31f);
 
     void Awake()
     {
         pv = GetComponent<PhotonView>();
 
         //PhotonView Observed Components 속성에 TankMove 스크립트를 연결
-        pv.ObservedComponents[0] = this;
+        pv.ObservedComponents[2] = this;
     }
 
     void Start()
@@ -135,8 +139,7 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
             }
             if (GameMgr.m_GameState == GameState.GS_Playing)
             {
-                if (muzzleFlash.enabled != false)
-                    muzzleFlash.enabled = false;
+                
                 if (isCursor)
                 {
                     Cursor.visible = false;
@@ -150,10 +153,11 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
                     rbody.drag = -5;
 
                 Shot();
-
                 switch (playerstate)
                 {
                     case PlayerState.idle:
+                        if (muzzleFlash.enabled != false)
+                            muzzleFlash.enabled = false;
                         Aimpos(false);
                         AnimType("Idle");
                         break;
@@ -173,7 +177,8 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
 
                         break;
                     case PlayerState.death:
-
+                        AnimType("Death");
+                        RightArm.transform.localPosition = Vector3.Lerp(RightArm.transform.localPosition, DeathArm, Time.deltaTime * 2.0f);
                         break;
                 }
                 FirePosCheck();
@@ -183,6 +188,47 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
                 CharacterRotation();
                 reloadingFunc();
             }
+        }
+        else
+        {
+            playerstate = Netplayerstate;
+            switch (playerstate)
+            {
+                case PlayerState.idle:
+                    if (muzzleFlash.enabled != false)
+                        muzzleFlash.enabled = false;
+                    AnimType("Idle");
+                    break;
+                case PlayerState.move:
+                    AnimType("Move");
+                    break;
+                case PlayerState.run:
+                    if (iszoomOnOff)
+                        playerstate = PlayerState.move;
+                    AnimType("Run");
+                    break;
+                case PlayerState.shot:
+
+                    break;
+                case PlayerState.death:
+                    AnimType("Death");
+                    RightArm.transform.localPosition = Vector3.Lerp(RightArm.transform.localPosition, DeathArm, Time.deltaTime * 10.0f);
+                    break;
+            }
+        }
+    }
+
+    void CursorCheck()
+    {
+        if(Input.GetKey(KeyCode.LeftAlt))
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
     }
 
@@ -396,37 +442,43 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (GameMgr.m_GameState == GameState.GS_Playing)
         {
-            
-            if (Input.GetMouseButton(0))
+            if (playerstate != PlayerState.death)
             {
-                isShot = true;
-            }
-            else
-            {
-                isShot = false;
-            }
+                if (Input.GetMouseButton(0))
+                {
+                    isShot = true;
+                }
+                else
+                {
+                    isShot = false;
+                }
 
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                Instantiate(Grenade, GrenadePos.position, GrenadePos.rotation);
-            }
+                if (GrenadeCount > 0)
+                {
+                    if (Input.GetKeyDown(KeyCode.G))
+                    {
+                        Instantiate(Grenade, GrenadePos.position, GrenadePos.rotation);
+                        GrenadeCount--;
+                    }
+                }
 
-            if (Input.GetMouseButton(1))
-            {
-                aimGroup.SetActive(false);
-                zoom.enabled = true;
-                iszoomOnOff = true;
-            }
-            else//if(Input.GetMouseButtonUp(1))
-            {
-                zoom.enabled = false;
-                aimGroup.SetActive(true);
-                iszoomOnOff = false;
-            }
+                if (Input.GetMouseButton(1))
+                {
+                    aimGroup.SetActive(false);
+                    zoom.enabled = true;
+                    iszoomOnOff = true;
+                }
+                else//if(Input.GetMouseButtonUp(1))
+                {
+                    zoom.enabled = false;
+                    aimGroup.SetActive(true);
+                    iszoomOnOff = false;
+                }
 
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                isReloading = true;
+                if (Input.GetKeyDown(KeyCode.R))
+                {
+                    isReloading = true;
+                }
             }
         }
     }
@@ -491,5 +543,14 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
+        
+        if (stream.IsWriting)
+        {
+            stream.SendNext(playerstate);
+        }
+        else  
+        {
+            Netplayerstate = (PlayerState)stream.ReceiveNext();
+        }
     }
 }

@@ -63,18 +63,20 @@ public class GrenadeCtrl : MonoBehaviour
             explosion.GetComponentInChildren<ParticleSystem>().main.duration + 1.0f);
 
         //지정한 원점을 중심으로 10.0f 반경 내에 들어와 있는 Collider 객체 추출
-        Collider[] colls = Physics.OverlapSphere(this.transform.position, 10.0f);
+        Collider[] colls = Physics.OverlapSphere(this.transform.position, 20.0f);
 
-        //////추출한 Collider 객체에 폭발력 전달
-        //MonsterCtrl a_MonCtrl = null;
-        //foreach (Collider coll in colls)
-        //{
-        //    a_MonCtrl = coll.GetComponent<MonsterCtrl>();
-        //    if (a_MonCtrl == null)
-        //        continue;
+        ////추출한 Collider 객체에 폭발력 전달
+        PlayerDamage a_PlayerDamage = null;
+        foreach (Collider coll in colls)
+        {
+            a_PlayerDamage = coll.GetComponent<PlayerDamage>();
+            if (a_PlayerDamage == null)
+                continue;
 
-        //    a_MonCtrl.TakeDamage(150);
-        //}
+            float distance = Vector3.Distance(a_PlayerDamage.transform.position, transform.position);
+
+            a_PlayerDamage.currHp -= (int)(150 - distance * 20);
+        }
 
         //즉시 제거
         Destroy(gameObject);

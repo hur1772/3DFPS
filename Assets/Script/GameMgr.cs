@@ -859,20 +859,20 @@ public class GameMgr : MonoBehaviourPunCallbacks
             return;
         }//if (5 <= (m_Team1Win + m_Team2Win))
 
-        ////-------------- 한 Round가 끝나고 다음 Round의 게임을 시작 시키기 위한 부분... 
-        ////모든탱크 GS_Ready 상태일 때 모든 탱크 대기 상태로 만들기...
-        //if (m_OldState != GameState.GS_Ready && m_GameState == GameState.GS_Ready)
-        //{
-        //    GameObject[] tanks = GameObject.FindGameObjectsWithTag("Player");
-        //    foreach (GameObject tank in tanks)
-        //    {
-        //        PlayerDamage playerDamage = tank.GetComponent<PlayerDamage>();
-        //        if (playerDamage != null)
-        //            playerDamage.ReadyStateTank(); //다음 라운드 준비 --> 1
-        //    }
-        //}
-        //m_OldState = m_GameState;
-        ////-------------- 한 Round가 끝나고 다은 Round의 게임을 시작 시키기 위한 부분... 
+        //-------------- 한 Round가 끝나고 다음 Round의 게임을 시작 시키기 위한 부분... 
+        //모든탱크 GS_Ready 상태일 때 모든 탱크 대기 상태로 만들기...
+        if (m_OldState != GameState.GS_Ready && m_GameState == GameState.GS_Ready)
+        {
+            GameObject[] tanks = GameObject.FindGameObjectsWithTag("Player");
+            foreach (GameObject tank in tanks)
+            {
+                PlayerDamage playerDamage = tank.GetComponent<PlayerDamage>();
+                if (playerDamage != null)
+                    playerDamage.ReadyStateTank(); //다음 라운드 준비 --> 1
+            }
+        }
+        m_OldState = m_GameState;
+        //-------------- 한 Round가 끝나고 다은 Round의 게임을 시작 시키기 위한 부분... 
 
 
     }//void WinLoseObserver()
@@ -888,41 +888,41 @@ public class GameMgr : MonoBehaviourPunCallbacks
 
         GameObject[] tanks = GameObject.FindGameObjectsWithTag("Player");
 
-        //Player[] players = PhotonNetwork.PlayerList; //using Photon.Realtime;
-        //foreach (Player _player in players)
-        //{
-        //    if (_player.CustomProperties.ContainsKey("MyTeam") == true)
-        //        a_PlrTeam = (string)_player.CustomProperties["MyTeam"];
+        Player[] players = PhotonNetwork.PlayerList; //using Photon.Realtime;
+        foreach (Player _player in players)
+        {
+            if (_player.CustomProperties.ContainsKey("MyTeam") == true)
+                a_PlrTeam = (string)_player.CustomProperties["MyTeam"];
 
-        //    PlayerDamage playerDamage = null;
-        //    foreach (GameObject tank in tanks)
-        //    {
-        //        PlayerDamage a_tankDmg = tank.GetComponent<PlayerDamage>();
-        //        //탱크의 playerId가 포탄의 playerId와 동일한지 판단
-        //        if (a_tankDmg == null)
-        //            continue;
+            PlayerDamage playerDamage = null;
+            foreach (GameObject tank in tanks)
+            {
+                PlayerDamage a_tankDmg = tank.GetComponent<PlayerDamage>();
+                //탱크의 playerId가 포탄의 playerId와 동일한지 판단
+                if (a_tankDmg == null)
+                    continue;
 
-        //        if (a_tankDmg.playerId == _player.ActorNumber)
-        //        {
-        //            playerDamage = a_tankDmg;
-        //            break;
-        //        }
-        //    }//foreach (GameObject tank in tanks)
+                if (a_tankDmg.playerId == _player.ActorNumber)
+                {
+                    playerDamage = a_tankDmg;
+                    break;
+                }
+            }//foreach (GameObject tank in tanks)
 
-        //    if (a_PlrTeam == "blue")
-        //    {
-        //        if (playerDamage != null && 0 < playerDamage.currHp)
-        //            rowTm1 = 1;  //팀1 중에 한명이라도 살아 있다는 의미
-        //        a_Tm1Count++;    //이 방에 남아 있는 팀1 의 플레이어 수
-        //    }
-        //    else if (a_PlrTeam == "black")
-        //    {
-        //        if (playerDamage != null && 0 < playerDamage.currHp)
-        //            rowTm2 = 1;  //팀2 중에 한명이라도 살아 있다는 의미
-        //        a_Tm2Count++;    //이 방에 남아 있는 팀2 의 플레이어 수
-        //    }
+            if (a_PlrTeam == "blue")
+            {
+                if (playerDamage != null && 0 < playerDamage.currHp)
+                    rowTm1 = 1;  //팀1 중에 한명이라도 살아 있다는 의미
+                a_Tm1Count++;    //이 방에 남아 있는 팀1 의 플레이어 수
+            }
+            else if (a_PlrTeam == "black")
+            {
+                if (playerDamage != null && 0 < playerDamage.currHp)
+                    rowTm2 = 1;  //팀2 중에 한명이라도 살아 있다는 의미
+                a_Tm2Count++;    //이 방에 남아 있는 팀2 의 플레이어 수
+            }
 
-        //}//foreach (Player _player in players)
+        }//foreach (Player _player in players)
 
         //GameState.GS_Playing 상태일 때 계속 셋팅하다가
         m_GoWaitGame = 4.0f; //다시 4초후에 게임이 시작되도록...

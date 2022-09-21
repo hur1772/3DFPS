@@ -86,7 +86,10 @@ public class PlayerMove : MonoBehaviourPunCallbacks, IPunObservable
             }
             else
             {
-                playerCtrl.playerstate = PlayerCtrl.PlayerState.idle;
+                if (playerCtrl.playerstate != PlayerCtrl.PlayerState.death)
+                {
+                    playerCtrl.playerstate = PlayerCtrl.PlayerState.idle;
+                }
             }
 
             if (Input.GetKey(KeyCode.LeftShift))

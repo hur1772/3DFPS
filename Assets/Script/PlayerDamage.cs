@@ -120,7 +120,7 @@ public class PlayerDamage : MonoBehaviourPunCallbacks, IPunObservable
                 if (currHp <= 0) //이때만 사망처리
                 {
                     currHp = 0;
-
+                    m_playerCtrl.playerstate = PlayerCtrl.PlayerState.death;
                     if (0 <= m_Cur_LAttID)
                     {
                         // 지금 죽는 탱크 입장에서는 
@@ -137,8 +137,8 @@ public class PlayerDamage : MonoBehaviourPunCallbacks, IPunObservable
             } //if (0 < currHp)
             else //if (currHp <= 0) 
             {
-                m_playerCtrl.playerstate = PlayerCtrl.PlayerState.death;
-                //currHp = NetHp;
+                
+                currHp = NetHp;
                 ////<---OtherPC들이 부활할 때도 동기화 되어야 한다.
                 //if ((int)(initHp * 0.95f) < currHp)
                 //{ //이때가 부활 연출이 되어야 하는 상황
@@ -155,6 +155,15 @@ public class PlayerDamage : MonoBehaviourPunCallbacks, IPunObservable
                 //} //if ((int)(initHp * 0.95f) < currHp)
             } //if (currHp <= 0) 
         } //if (pv.IsMine == false)
+        else
+        {
+            if (currHp <= 0) //이때만 사망처리
+            {
+                currHp = 0;
+                m_playerCtrl.playerstate = PlayerCtrl.PlayerState.death;
+            }
+            hpBar.fillAmount = (float)currHp / (float)initHp;
+        }
 
         ReceiveKillCount();
     } //void Update()
@@ -258,6 +267,7 @@ public class PlayerDamage : MonoBehaviourPunCallbacks, IPunObservable
         if (currHp <= 0)  //죽는 처리 
         {
             StartCoroutine(this.ExplosionTank());
+            m_playerCtrl.playerstate = PlayerCtrl.PlayerState.death;
         }
     } //public void TakeDamage(int AttackerId)
 
@@ -327,20 +337,6 @@ public class PlayerDamage : MonoBehaviourPunCallbacks, IPunObservable
 
     } //void SetTankVisible(bool isVisible)
 
-    public void OnPhotonSerializeView(PhotonStream stream,
-                                      PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)  //로컬 플레이어의 정보 송신
-        {
-            stream.SendNext(m_Cur_LAttID);
-            stream.SendNext(currHp);
-        }
-        else //원격 플레이어(아바타)의 정보 수신
-        {
-            m_Cur_LAttID = (int)stream.ReceiveNext();
-            NetHp = (int)stream.ReceiveNext();
-        }
-    }
 
     #region --------------- CustomProperties KillCount 초기화
     //자신을 파괴시킨 적 탱크를 검색해 스코어를 증가시키는 함수
@@ -515,5 +511,20 @@ public class PlayerDamage : MonoBehaviourPunCallbacks, IPunObservable
             a_SitIdx = (int)a_Player.CustomProperties["SitPosInx"];
 
         return a_SitIdx;
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream,
+                                      PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)  //로컬 플레이어의 정보 송신
+        {
+            stream.SendNext(m_Cur_LAttID);
+            stream.SendNext(currHp);
+        }
+        else //원격 플레이어(아바타)의 정보 수신
+        {
+            m_Cur_LAttID = (int)stream.ReceiveNext();
+            NetHp = (int)stream.ReceiveNext();
+        }
     }
 }

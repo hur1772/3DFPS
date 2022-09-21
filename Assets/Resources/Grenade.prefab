@@ -14,9 +14,10 @@ GameObject:
   - component: {fileID: 3489974458502900643}
   - component: {fileID: 3489974458502900645}
   - component: {fileID: 3489974458502900644}
-  m_Layer: 0
+  - component: {fileID: 4848723864622918023}
+  m_Layer: 15
   m_Name: Grenade
-  m_TagString: Untagged
+  m_TagString: Grenade
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -126,3 +127,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   expEffect: {fileID: 100010, guid: 031d08f52af1daa4f929b85221519426, type: 3}
+--- !u!135 &4848723864622918023
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1247194914359377438}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 5
+  m_Center: {x: 0, y: 0.06557491, z: 0.021858305}

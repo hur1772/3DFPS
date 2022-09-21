@@ -8,6 +8,7 @@ TagManager:
   - ROOM_ITEM
   - TKNODE_ITEM
   - PLAYERNODE_ITEM
+  - Grenade
   layers:
   - Default
   - TransparentFX
@@ -24,7 +25,7 @@ TagManager:
   - Player
   - BULLET
   - DiePlayer
-  - 
+  - Grenade
   - 
   - 
   - 
