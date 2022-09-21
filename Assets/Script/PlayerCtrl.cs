@@ -184,6 +184,7 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
                 FirePosCheck();
                 stateCheck();
 
+                
                 CameraRotation();
                 CharacterRotation();
                 reloadingFunc();
