@@ -100,6 +100,8 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
     private PhotonView pv = null;
 
     Vector3 DeathArm = new Vector3(0.17f,0.24f,-1.31f);
+    Vector3 SaveArmPos;
+    PlayerDamage playerdmg;
 
     void Awake()
     {
@@ -113,6 +115,9 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
     {
         //rbody = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+        playerdmg = GetComponent<PlayerDamage>();
+
+        SaveArmPos = RightArm.transform.localPosition;
 
         muzzleFlash.enabled = false;
 
@@ -139,55 +144,66 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
             }
             if (GameMgr.m_GameState == GameState.GS_Playing)
             {
-                
-                if (isCursor)
+                if (playerdmg.isdeath && this.gameObject.layer == LayerMask.NameToLayer("Player"))
                 {
-                    Cursor.visible = false;
-                    Cursor.lockState = CursorLockMode.Locked;
+                    RightArm.transform.localPosition = SaveArmPos;
+                    curbullet = 30;
+                    maxbullet = 150;
+                    playerstate = PlayerState.idle;
                 }
-                if (isGround)
+
+                if (playerstate != PlayerState.death)
                 {
-                    rbody.drag = 50;
+                    if (isCursor)
+                    {
+                        Cursor.visible = false;
+                        Cursor.lockState = CursorLockMode.Locked;
+                    }
+                    if (isGround)
+                    {
+                        rbody.drag = 50;
+                    }
+                    else
+                        rbody.drag = -5;
+
+                    Shot();
+                    switch (playerstate)
+                    {
+                        case PlayerState.idle:
+                            if (muzzleFlash.enabled != false)
+                                muzzleFlash.enabled = false;
+                            Aimpos(false);
+                            AnimType("Idle");
+                            break;
+                        case PlayerState.move:
+                            maxaim = 50;
+                            AnimType("Move");
+                            playerMove.Move(walkSpeed);
+                            break;
+                        case PlayerState.run:
+                            if (iszoomOnOff)
+                                playerstate = PlayerState.move;
+                            maxaim = 70;
+                            AnimType("Run");
+                            playerMove.Run();
+                            break;
+                        case PlayerState.shot:
+
+                            break;
+                        case PlayerState.death:
+                            AnimType("Death");
+                            RightArm.transform.localPosition = Vector3.Lerp(RightArm.transform.localPosition, DeathArm, Time.deltaTime * 2.0f);
+                            break;
+                    }
+                    FirePosCheck();
+                    stateCheck();
+
+
+                    CameraRotation();
+                    CharacterRotation();
+                    reloadingFunc();
                 }
-                else
-                    rbody.drag = -5;
-
-                Shot();
-                switch (playerstate)
-                {
-                    case PlayerState.idle:
-                        if (muzzleFlash.enabled != false)
-                            muzzleFlash.enabled = false;
-                        Aimpos(false);
-                        AnimType("Idle");
-                        break;
-                    case PlayerState.move:
-                        maxaim = 50;
-                        AnimType("Move");
-                        playerMove.Move(walkSpeed);
-                        break;
-                    case PlayerState.run:
-                        if (iszoomOnOff)
-                            playerstate = PlayerState.move;
-                        maxaim = 70;
-                        AnimType("Run");
-                        playerMove.Run();
-                        break;
-                    case PlayerState.shot:
-
-                        break;
-                    case PlayerState.death:
-                        AnimType("Death");
-                        RightArm.transform.localPosition = Vector3.Lerp(RightArm.transform.localPosition, DeathArm, Time.deltaTime * 2.0f);
-                        break;
-                }
-                FirePosCheck();
-                stateCheck();
-
-                
-                CameraRotation();
-                CharacterRotation();
-                reloadingFunc();
+                CursorCheck();
             }
         }
         else
@@ -260,7 +276,7 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
                     //AnimType("Shot");
                     playerstate = PlayerState.shot;
                     Fire();
-                    fireDur = 0.1f;
+                    fireDur = 0.25f;
                     curbullet--;
                     curBullettxt.text = curbullet.ToString();
                 }
@@ -343,10 +359,20 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
         //    return;
 
         //메인 카메라에서 마우스 커서의 위치로 캐스팅되는 Ray를 생성
-       
+
 
         //Bullet 프리팹을 동적으로 생성
-        Instantiate(bullet, firePos.position, firePos.rotation);
+        GameObject a_Bullet = Instantiate(bullet, firePos.position, firePos.rotation);
+        a_Bullet.GetComponent<BulletCtrl>().AttackerId = pv.Owner.ActorNumber;  //ownerId
+        //Owner : 
+        //(나를 포함한 원격지의 탱크들) 입장에서 IsMine의 정보를 접근할 수 있는 참조 변수
+        //원격지 탱크들 입장에서 지금 이 탱크의 IsMine 정보에 접든 할수 있는 방법
+
+        if (pv.Owner.CustomProperties.ContainsKey("MyTeam") == true)
+        {
+            a_Bullet.GetComponent<BulletCtrl>().AttackerTeam =
+                    (string)pv.Owner.CustomProperties["MyTeam"];
+        }
     }
 
     IEnumerator ShowMuzzleFlash()

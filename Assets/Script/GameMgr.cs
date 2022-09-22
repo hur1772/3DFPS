@@ -37,6 +37,8 @@ public class GameMgr : MonoBehaviourPunCallbacks
     ExitGames.Client.Photon.Hashtable m_StateProps =
                       new ExitGames.Client.Photon.Hashtable();
 
+    public bool isRoundEnd = false;
+
     //--------------------Team Select 부분
     [Header("--- Team1 UI ---")]
     public GameObject Team1Panel;
@@ -226,10 +228,10 @@ public class GameMgr : MonoBehaviourPunCallbacks
         {
             Team1Panel.SetActive(false);
             Team2Panel.SetActive(false);
-            //m_WaitTmText.gameObject.SetActive(false);
+            m_WaitTmText.gameObject.SetActive(false);
         }//if (m_GameState == GameState.GS_Playing)
 
-        //WinLoseObserver();
+        WinLoseObserver();
     } //void Update()
 
     void EnterChat()
@@ -752,7 +754,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
         Player[] players = PhotonNetwork.PlayerList; //using Photon.Realtime;
         string PlayerTeam = "blue";
 
-        GameObject[] tanks = GameObject.FindGameObjectsWithTag("Player");
+        GameObject[] Playersobj = GameObject.FindGameObjectsWithTag("Player");
 
         foreach (Player _player in players)
         {
@@ -764,57 +766,57 @@ public class GameMgr : MonoBehaviourPunCallbacks
             if (_player.CustomProperties.ContainsKey("MyTeam") == true)
                 PlayerTeam = (string)_player.CustomProperties["MyTeam"];
 
-            //PlayerDamage playerDamage = null;
-            //foreach (GameObject tank in tanks)
-            //{
-            //    PlayerDamage a_tankDmg = tank.GetComponent<PlayerDamage>();
-            //    //탱크의 playerId가 포탄의 playerId와 동일한지 판단
-            //    if (a_tankDmg == null)
-            //        continue;
-            //    if (a_tankDmg.playerId == _player.ActorNumber)
-            //    {
-            //        playerDamage = a_tankDmg;
-            //        break;
-            //    }
-            //}//foreach (GameObject tank in tanks)
+            PlayerDamage playerDamage = null;
+            foreach (GameObject player in Playersobj)
+            {
+                PlayerDamage a_playerDmg = player.GetComponent<PlayerDamage>();
+                //탱크의 playerId가 포탄의 playerId와 동일한지 판단
+                if (a_playerDmg == null)
+                    continue;
+                if (a_playerDmg.playerId == _player.ActorNumber)
+                {
+                    playerDamage = a_playerDmg;
+                    break;
+                }
+            }//foreach (GameObject tank in tanks)
 
-            //if (playerDamage != null) 
-            //{ //모든 캐릭터의 에너지바 동기화
-            //    a_CurHP = playerDamage.currHp; 
-            //}//(tankDamage != null) 
+            if (playerDamage != null)
+            { //모든 캐릭터의 에너지바 동기화
+                a_CurHP = playerDamage.currHp;
+            }//(tankDamage != null) 
 
-            //if (PlayerTeam == "blue")
-            //{
-            //    if (a_CurHP <= 0) //죽어 있을 때 
-            //    {
-            //        GUILayout.Label("<color=Blue><size=25>" +
-            //            "[" + _player.ActorNumber + "] " + _player.NickName + " "
-            //            + currKillCount + " kill" + "</size></color>"
-            //            + "<color=Red><size=25>" + " <Die>" + "</size></color>");
-            //    }
-            //    else  //살아 있을 때 
-            //    {
-            //        GUILayout.Label("<color=Blue><size=25>" + 
-            //            "[" + _player.ActorNumber + "] " + _player.NickName + " " 
-            //            + currKillCount + " kill" + "</size></color>");
-            //    }
-            //}
-            //else //if (PlayerTeam == "black")
-            //{
-            //    if (a_CurHP <= 0)
-            //    {
-            //        GUILayout.Label("<color=Black><size=25>" +
-            //            "[" + _player.ActorNumber + "] " + _player.NickName + " "
-            //            + currKillCount + " kill" + "</size></color>"
-            //            + "<color=Red><size=25>" + " <Die>" + "</size></color>");
-            //    }
-            //    else
-            //    {
-            //        GUILayout.Label("<color=Black><size=25>" + 
-            //            "[" + _player.ActorNumber + "] " + _player.NickName + " " 
-            //            + currKillCount + " kill" + "</size></color>");
-            //    }
-            //}// else //if (PlayerTeam == "black")
+            if (PlayerTeam == "blue")
+            {
+                if (a_CurHP <= 0) //죽어 있을 때 
+                {
+                    GUILayout.Label("<color=Blue><size=15>" +
+                        "[" + _player.ActorNumber + "] " + _player.NickName + " "
+                        + currKillCount + " kill" + "</size></color>"
+                        + "<color=Red><size=15>" + " <Die>" + "</size></color>");
+                }
+                else  //살아 있을 때 
+                {
+                    GUILayout.Label("<color=Blue><size=15>" +
+                        "[" + _player.ActorNumber + "] " + _player.NickName + " "
+                        + currKillCount + " kill" + "</size></color>");
+                }
+            }
+            else //if (PlayerTeam == "black")
+            {
+                if (a_CurHP <= 0)
+                {
+                    GUILayout.Label("<color=Black><size=15>" +
+                        "[" + _player.ActorNumber + "] " + _player.NickName + " "
+                        + currKillCount + " kill" + "</size></color>"
+                        + "<color=Red><size=15>" + " <Die>" + "</size></color>");
+                }
+                else
+                {
+                    GUILayout.Label("<color=Black><size=15>" +
+                        "[" + _player.ActorNumber + "] " + _player.NickName + " "
+                        + currKillCount + " kill" + "</size></color>");
+                }
+            }// else //if (PlayerTeam == "black")
 
         }//foreach (Player _player in players)
     }//void OnGUI()

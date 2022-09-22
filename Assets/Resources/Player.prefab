@@ -1342,6 +1342,7 @@ MonoBehaviour:
   txtKillCount: {fileID: 0}
   playerId: -1
   m_ReSetTime: 0
+  isdeath: 0
 --- !u!114 &3392540477196490833
 MonoBehaviour:
   m_ObjectHideFlags: 0

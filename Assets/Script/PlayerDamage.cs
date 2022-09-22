@@ -44,6 +44,8 @@ public class PlayerDamage : MonoBehaviourPunCallbacks, IPunObservable
     [HideInInspector] public float m_ReSetTime = 0.0f;   //부활시간딜레이
     //시작후에도 딜레이 주기 10초동안
 
+    public bool isdeath = false;
+
     PlayerCtrl m_playerCtrl;
 
     void Awake()
@@ -120,7 +122,7 @@ public class PlayerDamage : MonoBehaviourPunCallbacks, IPunObservable
                 if (currHp <= 0) //이때만 사망처리
                 {
                     currHp = 0;
-                    m_playerCtrl.playerstate = PlayerCtrl.PlayerState.death;
+                    //m_playerCtrl.playerstate = PlayerCtrl.PlayerState.death;
                     if (0 <= m_Cur_LAttID)
                     {
                         // 지금 죽는 탱크 입장에서는 
@@ -137,28 +139,34 @@ public class PlayerDamage : MonoBehaviourPunCallbacks, IPunObservable
             } //if (0 < currHp)
             else //if (currHp <= 0) 
             {
+                if(isdeath)
+                {
+                    
+                    isdeath = false;
+                }
                 
                 currHp = NetHp;
                 ////<---OtherPC들이 부활할 때도 동기화 되어야 한다.
-                //if ((int)(initHp * 0.95f) < currHp)
-                //{ //이때가 부활 연출이 되어야 하는 상황
-                //    //Filled 이미지 초깃값으로 환원
-                //    hpBar.fillAmount = 1.0f;
-                //    //HUD 활성화
-                //    hudCanvas.enabled = true;
+                if ((int)(initHp * 0.95f) < currHp)
+                { //이때가 부활 연출이 되어야 하는 상황
+                    //Filled 이미지 초깃값으로 환원
+                    //hpBar.fillAmount = 1.0f;
+                    //HUD 활성화
+                    //hudCanvas.enabled = true;
 
-                //    //리스폰 시 생명 초깃값 설정
-                //    currHp = initHp;
-
-                //    //탱크를 다시 보이게 처리
-                //    SetTankVisible(true);
-                //} //if ((int)(initHp * 0.95f) < currHp)
+                    //리스폰 시 생명 초깃값 설정
+                    currHp = initHp;
+                    //m_playerCtrl.playerstate = PlayerCtrl.PlayerState.idle;
+                    //탱크를 다시 보이게 처리
+                    SetTankVisible(true);
+                } //if ((int)(initHp * 0.95f) < currHp)
             } //if (currHp <= 0) 
         } //if (pv.IsMine == false)
         else
         {
             if (currHp <= 0) //이때만 사망처리
             {
+                isdeath = true;
                 currHp = 0;
                 m_playerCtrl.playerstate = PlayerCtrl.PlayerState.death;
             }
@@ -328,8 +336,8 @@ public class PlayerDamage : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (isVisible == false)
                 _a_CapsuleColls.gameObject.layer = LayerMask.NameToLayer("DiePlayer");
-            else
-                _a_CapsuleColls.gameObject.layer = LayerMask.NameToLayer("Default");
+            else            
+                _a_CapsuleColls.gameObject.layer = LayerMask.NameToLayer("Player");
         }
 
         if (isVisible == true)

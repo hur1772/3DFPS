@@ -12,9 +12,19 @@ public class BulletCtrl : MonoBehaviour
     //스파크 파티클 프리팹 연결할 변수
     public GameObject sparkEffect;
 
+    private CapsuleCollider _collider;
+    private Rigidbody _rigidbody;
+
+    [HideInInspector] public int AttackerId = -1;
+    //누가 쏜 총알인지를 저장하기 위한 변수
+    [HideInInspector] public string AttackerTeam = "blue";
+
     // Start is called before the first frame update
     void Start()
     {
+        _collider = GetComponent<CapsuleCollider>();
+        _rigidbody = GetComponent<Rigidbody>();
+
         speed = 3000.0f;
 
         //-- 날아가는 방향 재조정
