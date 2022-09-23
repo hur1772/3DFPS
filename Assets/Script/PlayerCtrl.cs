@@ -72,7 +72,7 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
     public Transform GrenadePos;
     public GameObject Grenade;
 
-    int GrenadeCount = 2;
+    public int GrenadeCount = 2;
 
     //에임 관련 변수
     public RectTransform[] aim; //{up,down,left,right}
@@ -101,7 +101,12 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
 
     Vector3 DeathArm = new Vector3(0.17f,0.24f,-1.31f);
     Vector3 SaveArmPos;
+
+    Vector3 NetArmPos;
     PlayerDamage playerdmg;
+
+    Quaternion NetFireRot;
+    Quaternion NetGdRot;
 
     void Awake()
     {
@@ -149,7 +154,9 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
                     RightArm.transform.localPosition = SaveArmPos;
                     curbullet = 30;
                     maxbullet = 150;
+                    GrenadeCount = 2;
                     playerstate = PlayerState.idle;
+                    playerdmg.isdeath = false;
                 }
 
                 if (playerstate != PlayerState.death)
@@ -208,7 +215,17 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
+            RightArm.transform.localPosition = NetArmPos;
             playerstate = Netplayerstate;
+            firePos.rotation = NetFireRot;
+            GrenadePos.rotation = NetGdRot;
+
+            if(playerdmg.isdeath)
+            {
+                playerstate = PlayerState.idle;
+                playerdmg.isdeath = false;
+            }
+
             switch (playerstate)
             {
                 case PlayerState.idle:
@@ -484,7 +501,8 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
                 {
                     if (Input.GetKeyDown(KeyCode.G))
                     {
-                        Instantiate(Grenade, GrenadePos.position, GrenadePos.rotation);
+                        GdShoot();
+                        pv.RPC("GdShoot", RpcTarget.Others, null);
                         GrenadeCount--;
                     }
                 }
@@ -508,6 +526,12 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
                 }
             }
         }
+    }
+
+    [PunRPC]
+    void GdShoot()
+    {
+        Instantiate(Grenade, GrenadePos.position, GrenadePos.rotation);
     }
 
     void reloadingFunc()
@@ -574,10 +598,16 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(playerstate);
+            stream.SendNext(RightArm.transform.localPosition);
+            stream.SendNext(firePos.rotation);
+            stream.SendNext(GrenadePos.rotation);
         }
         else  
         {
             Netplayerstate = (PlayerState)stream.ReceiveNext();
+            NetArmPos = (Vector3)stream.ReceiveNext();
+            NetFireRot = (Quaternion)stream.ReceiveNext();
+            NetGdRot = (Quaternion)stream.ReceiveNext();
         }
     }
 }

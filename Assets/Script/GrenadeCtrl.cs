@@ -75,7 +75,10 @@ public class GrenadeCtrl : MonoBehaviour
 
             float distance = Vector3.Distance(a_PlayerDamage.transform.position, transform.position);
 
-            a_PlayerDamage.currHp -= (int)(150 - distance * 20);
+            if ((int)(150 - distance * 20) > 0)
+            {
+                a_PlayerDamage.currHp -= (int)(150 - distance * 20);
+            }
         }
 
         //즉시 제거

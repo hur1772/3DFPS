@@ -1287,6 +1287,7 @@ MonoBehaviour:
   firePos: {fileID: 9033564129296123554}
   GrenadePos: {fileID: 482154617}
   Grenade: {fileID: 1247194914359377438, guid: ce23ec762c36543428e72d2667268afc, type: 3}
+  GrenadeCount: 2
   aim:
   - {fileID: 0}
   - {fileID: 0}

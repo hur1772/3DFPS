@@ -190,7 +190,7 @@ public class PlayerDamage : MonoBehaviourPunCallbacks, IPunObservable
             //    a_AttTeam = a_refCanon.AttackerTeam;
             //}
 
-            TakeDamage(a_Att_ID, a_AttTeam);  //여기서의 매개변수는 나를 공격한 유저 ID
+            //TakeDamage(a_Att_ID, a_AttTeam);  //여기서의 매개변수는 나를 공격한 유저 ID
 
 
             currHp -= 20;
