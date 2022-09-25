@@ -3001,7 +3001,7 @@ RectTransform:
   - {fileID: 1941916347}
   - {fileID: 1550476193}
   m_Father: {fileID: 192705325}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -5659,9 +5659,9 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
+  - {fileID: 1072380920}
   - {fileID: 114855099}
   - {fileID: 649209258}
-  - {fileID: 1072380920}
   - {fileID: 1923488585}
   - {fileID: 1462229402048351942}
   - {fileID: 1462229402252817250}
@@ -17920,7 +17920,7 @@ Transform:
   - {fileID: 1001806015}
   - {fileID: 1785380827}
   m_Father: {fileID: 192705325}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &652549967
 PrefabInstance:
@@ -20605,6 +20605,7 @@ MonoBehaviour:
   firePos: {fileID: 428889598}
   GrenadePos: {fileID: 0}
   Grenade: {fileID: 1247194914359377438, guid: ce23ec762c36543428e72d2667268afc, type: 3}
+  GrenadeCount: 2
   aim:
   - {fileID: 933913900}
   - {fileID: 2049218320}
@@ -28955,7 +28956,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 192705325}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -58604,6 +58605,7 @@ MonoBehaviour:
   ExitRoomBtn: {fileID: 1810747499}
   txtLogMsg: {fileID: 1462229402566771043}
   textChat: {fileID: 1462229402252817251}
+  isRoundEnd: 0
   Team1Panel: {fileID: 1941916346}
   m_Team1ToTeam2: {fileID: 1274531341}
   m_Team1Ready: {fileID: 34614033}

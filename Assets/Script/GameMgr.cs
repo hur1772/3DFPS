@@ -785,38 +785,38 @@ public class GameMgr : MonoBehaviourPunCallbacks
                 a_CurHP = playerDamage.currHp;
             }//(tankDamage != null) 
 
-            if (PlayerTeam == "blue")
-            {
-                if (a_CurHP <= 0) //죽어 있을 때 
-                {
-                    GUILayout.Label("<color=Blue><size=15>" +
-                        "[" + _player.ActorNumber + "] " + _player.NickName + " "
-                        + currKillCount + " kill" + "</size></color>"
-                        + "<color=Red><size=15>" + " <Die>" + "</size></color>");
-                }
-                else  //살아 있을 때 
-                {
-                    GUILayout.Label("<color=Blue><size=15>" +
-                        "[" + _player.ActorNumber + "] " + _player.NickName + " "
-                        + currKillCount + " kill" + "</size></color>");
-                }
-            }
-            else //if (PlayerTeam == "black")
-            {
-                if (a_CurHP <= 0)
-                {
-                    GUILayout.Label("<color=Black><size=15>" +
-                        "[" + _player.ActorNumber + "] " + _player.NickName + " "
-                        + currKillCount + " kill" + "</size></color>"
-                        + "<color=Red><size=15>" + " <Die>" + "</size></color>");
-                }
-                else
-                {
-                    GUILayout.Label("<color=Black><size=15>" +
-                        "[" + _player.ActorNumber + "] " + _player.NickName + " "
-                        + currKillCount + " kill" + "</size></color>");
-                }
-            }// else //if (PlayerTeam == "black")
+            //if (PlayerTeam == "blue")
+            //{
+            //    if (a_CurHP <= 0) //죽어 있을 때 
+            //    {
+            //        GUILayout.Label("<color=Blue><size=15>" +
+            //            "[" + _player.ActorNumber + "] " + _player.NickName + " "
+            //            + currKillCount + " kill" + "</size></color>"
+            //            + "<color=Red><size=15>" + " <Die>" + "</size></color>");
+            //    }
+            //    else  //살아 있을 때 
+            //    {
+            //        GUILayout.Label("<color=Blue><size=15>" +
+            //            "[" + _player.ActorNumber + "] " + _player.NickName + " "
+            //            + currKillCount + " kill" + "</size></color>");
+            //    }
+            //}
+            //else //if (PlayerTeam == "black")
+            //{
+            //    if (a_CurHP <= 0)
+            //    {
+            //        GUILayout.Label("<color=Black><size=15>" +
+            //            "[" + _player.ActorNumber + "] " + _player.NickName + " "
+            //            + currKillCount + " kill" + "</size></color>"
+            //            + "<color=Red><size=15>" + " <Die>" + "</size></color>");
+            //    }
+            //    else
+            //    {
+            //        GUILayout.Label("<color=Black><size=15>" +
+            //            "[" + _player.ActorNumber + "] " + _player.NickName + " "
+            //            + currKillCount + " kill" + "</size></color>");
+            //    }
+            //}// else //if (PlayerTeam == "black")
 
         }//foreach (Player _player in players)
     }//void OnGUI()
