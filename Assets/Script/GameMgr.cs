@@ -90,10 +90,24 @@ public class GameMgr : MonoBehaviourPunCallbacks
     //--------------- Round 관련 변수
 
     public Text m_GameEndText;
+    public InputField m_AimSet;
+    public Text m_AimSetPlacholder;
+    public Slider m_AimSetSlider;
+    float m_SaveSlideVal;
+
+    public GameObject AimSettingGroup;
+
+    public float m_AimSetVal = 1.1f;
+    float m_AimSetValSave;
+
+    public bool isSetting;
 
     void Awake()
     {
-      
+        m_AimSetVal = PlayerPrefs.GetFloat("m_AimSetVal", 1.1f);
+        m_AimSetPlacholder.text = m_AimSetVal.ToString("F2");
+        m_AimSetSlider.value = m_AimSetVal / 10;
+
         //--------------- 팀대전 관련 변수 초기화
         m_Team1Pos[0] = new Vector3(-17.91f, 1.81f, -1.28f);
         m_Team1Pos[1] = new Vector3(-16.05f, 1.81f, -1.28f);
@@ -185,11 +199,33 @@ public class GameMgr : MonoBehaviourPunCallbacks
         PhotonInit.isFocus = focus;
     }
 
+    void AimSetValue(string val)
+    {
+        if (float.TryParse(val, out m_AimSetValSave))
+        {
+            if (m_AimSetValSave >= 10)
+            {
+                m_AimSetValSave = 10;
+                m_AimSet.text = "10";
+            }
+            if (m_AimSetVal != m_AimSetValSave)
+            {
+                Debug.Log(m_AimSetVal);
+                m_AimSetVal = m_AimSetValSave;
+                PlayerPrefs.SetFloat("m_AimSetVal", m_AimSetVal);
+                m_AimSetSlider.value = m_AimSetVal / 10;
+            }
+        }
+
+    }
+
     // Update is called once per frame
     void Update()
     {
+        AimSetting();
+
         //게임 플로어를 돌려도 되는 상태인지 확인한다.
-        if (IsGamePossible() == false) 
+        if (IsGamePossible() == false)
             return;
 
         if (m_GameState == GameState.GS_Ready)
@@ -208,7 +244,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
             if (bEnter == true)
             {
                 textChat.gameObject.SetActive(bEnter);
-                textChat.ActivateInputField(); 
+                textChat.ActivateInputField();
                 //<--- 커서를 인풋필드로 이동시켜 줌
             }
             else
@@ -234,6 +270,27 @@ public class GameMgr : MonoBehaviourPunCallbacks
         WinLoseObserver();
     } //void Update()
 
+    void AimSetting()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            AimSettingGroup.SetActive(!AimSettingGroup.activeSelf);
+            isSetting = AimSettingGroup.activeSelf;
+
+        }
+
+        if (AimSettingGroup.activeSelf)
+        {
+            if (m_AimSet.text != null)
+                AimSetValue(m_AimSet.text);
+        }
+
+        if (m_AimSetSlider.value != m_SaveSlideVal)
+        {
+            m_SaveSlideVal = m_AimSetSlider.value;
+            m_AimSet.text = (m_SaveSlideVal*10).ToString("F2");
+        }
+    }
     void EnterChat()
     {
         string msg = "\n<color=#ffffff>[" + 

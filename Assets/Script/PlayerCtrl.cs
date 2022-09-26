@@ -108,6 +108,8 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
     Quaternion NetFireRot;
     Quaternion NetGdRot;
 
+    GameMgr m_gameMgr;
+
     void Awake()
     {
         pv = GetComponent<PhotonView>();
@@ -130,6 +132,7 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
         rbody.centerOfMass = new Vector3(0.0f, -2.5f, 0.0f);
         maxBullettxt = GameObject.Find("maxbullet").GetComponent<Text>();
         curBullettxt = GameObject.Find("curbullet").GetComponent<Text>();
+        m_gameMgr = GameObject.Find("GameMgr").GetComponent<GameMgr>();
         aimGroup = GameObject.Find("AimGroup");
         aim = aimGroup.GetComponentsInChildren<RectTransform>();
         zoom = GameObject.Find("zoom").GetComponent<Image>();
@@ -263,6 +266,19 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
+        }
+        if(m_gameMgr != null)
+        {
+            if(m_gameMgr.isSetting)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
+            else
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
         }
     }
 
@@ -472,6 +488,9 @@ public class PlayerCtrl : MonoBehaviourPunCallbacks, IPunObservable
 
     private void CameraRotation()
     {
+        if(lookSensitivity != m_gameMgr.m_AimSetVal)
+            lookSensitivity = m_gameMgr.m_AimSetVal;
+
         float _xRotation = Input.GetAxisRaw("Mouse Y");
         float _cameraRotationX = _xRotation * lookSensitivity;
 
